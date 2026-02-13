@@ -1,6 +1,6 @@
 ### VARIABLES TO CHANGE - START
-PROJECT_ID=
-SERVICE_NAME=
+PROJECT_ID=jeffrey-perparas-csu-fullerton
+SERVICE_NAME=ise-genai-baja
 ### VARIABLES TO CHANGE - END
 
 # ----------- Manual Deployment ------------ #
