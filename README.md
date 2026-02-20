@@ -2,7 +2,11 @@
 
 ## Our Team
 
-TODO: Replace with your team members
+Bryce Anderson <br>
+Adam White <br>
+Jeffery Perparas <br>
+Auriell Ferguson <br>
+Danae Ludy <br>
 
 # Setup
 
