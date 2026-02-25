@@ -33,7 +33,7 @@ def display_my_custom_component(value):
     create_component(data, html_file_name)
 
 
-# Danae's section (add other sections above or below mine)
+##################### Danae's Section ############################
 def _ensure_alert_state() -> None:
     """
     Ensures Streamlit session state has the keys needed for alerts.
@@ -274,3 +274,5 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
             st.dataframe(rows, hide_index=True, use_container_width=True)
         else:
             st.write("No upcoming alerts match your filters.")
+
+################## End of Danae's Section ########################
