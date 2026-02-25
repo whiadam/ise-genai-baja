@@ -139,9 +139,17 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
         st.markdown("### Create an Alert")
 
         with st.form("create_alert_form", clear_on_submit=True):
-            title = st.text_input("Alert Title")
-            category = st.selectbox("Category", ["Academic", "Dining", "Sports", "Social", "Safety", "Other"])
-            alert_type = st.selectbox("Alert Type", ["Event Reminder", "Personal Reminder", "Campus Announcement"])
+            title = st.text_input("Alert Title", key="alerts_title_input")
+            category = st.selectbox(
+                "Category",
+                ["Academic", "Dining", "Sports", "Social", "Safety", "Other"],
+                key="alerts_category_select",
+            )
+            alert_type = st.selectbox(
+                "Alert Type",
+                ["Event Reminder", "Personal Reminder", "Campus Announcement"],
+                key="alerts_type_select",
+            )
 
             minutes_before = None
             remind_at = None
@@ -149,28 +157,36 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
             event_name = None
 
             if alert_type == "Event Reminder":
-                before = st.selectbox("Notify", ["5 min", "15 min", "30 min", "1 hour", "1 day"])
+                before = st.selectbox(
+                    "Notify",
+                    ["5 min", "15 min", "30 min", "1 hour", "1 day"],
+                    key="alerts_notify_select",
+                )
                 minutes_before = {"5 min": 5, "15 min": 15, "30 min": 30, "1 hour": 60, "1 day": 1440}[before]
+
                 event_options = ["(none)"] + [e.get("name", "Untitled event") for e in events]
-                chosen = st.selectbox("Link to Event (optional)", event_options)
+                chosen = st.selectbox("Link to Event (optional)", event_options, key="alerts_link_event_select")
+
                 if chosen != "(none)":
                     idx = event_options.index(chosen) - 1
                     event_name = events[idx].get("name")
                     event_start = events[idx].get("start")
-                d = st.date_input("Event Date", value=date.today())
-                t = st.time_input("Event Start Time", value=time(18, 0))
+
+                d = st.date_input("Event Date", value=date.today(), key="alerts_event_date")
+                t = st.time_input("Event Start Time", value=time(18, 0), key="alerts_event_time")
+
                 if event_start is None:
                     event_start = _parse_dt(d, t)
 
             if alert_type == "Personal Reminder":
-                d = st.date_input("Reminder Date", value=date.today())
-                t = st.time_input("Reminder Time", value=time(18, 0))
+                d = st.date_input("Reminder Date", value=date.today(), key="alerts_reminder_date")
+                t = st.time_input("Reminder Time", value=time(18, 0), key="alerts_reminder_time")
                 remind_at = _parse_dt(d, t)
 
             st.markdown("**Delivery Methods**")
-            in_app = st.checkbox("In-app banner", value=True)
-            email = st.checkbox("Email (future)")
-            sms = st.checkbox("SMS (future)")
+            in_app = st.checkbox("In-app banner", value=True, key="alerts_delivery_in_app")
+            email = st.checkbox("Email (future)", key="alerts_delivery_email")
+            sms = st.checkbox("SMS (future)", key="alerts_delivery_sms")
 
             submit = st.form_submit_button("Save Alert")
 
@@ -240,9 +256,13 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
             if target:
                 st.markdown("### Edit Alert")
                 with st.form(f"edit_form_{edit_id}"):
-                    new_title = st.text_input("Alert Title", value=target["title"])
-                    new_category = st.selectbox("Category", ["Academic", "Dining", "Sports", "Social", "Safety", "Other"],
-                                                index=["Academic", "Dining", "Sports", "Social", "Safety", "Other"].index(target["category"]))
+                    new_title = st.text_input("Alert Title", value=target["title"], key=f"alerts_edit_title_{edit_id}")
+                    new_category = st.selectbox(
+                        "Category",
+                        ["Academic", "Dining", "Sports", "Social", "Safety", "Other"],
+                        index=["Academic", "Dining", "Sports", "Social", "Safety", "Other"].index(target["category"]),
+                        key=f"alerts_edit_category_{edit_id}",
+                    )
                     save_edit = st.form_submit_button("Save Changes")
 
                 if save_edit:
@@ -257,9 +277,13 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
         st.markdown("### Upcoming Alerts")
         fcol, scol = st.columns([1, 2])
         with fcol:
-            category_filter = st.selectbox("Filter", ["All", "Academic", "Dining", "Sports", "Social", "Safety", "Other"])
+            category_filter = st.selectbox(
+                "Filter",
+                ["All", "Academic", "Dining", "Sports", "Social", "Safety", "Other"],
+                key="alerts_upcoming_filter",
+            )
         with scol:
-            q = st.text_input("Search alerts")
+            q = st.text_input("Search alerts", key="alerts_upcoming_search")
 
         rows = []
         for tt, a in upcoming_pairs:

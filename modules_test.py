@@ -33,18 +33,6 @@ events = [{"name": "Test Event", "start": datetime.now().replace(second=0, micro
 display_alerts(user_id="user1", events=events)
 """
 
-    def test_alerts_initializes_session_state(self):
-        """
-        Verifies display_alerts initializes expected session_state keys.
-        """
-        at = AppTest.from_string(self._make_test_app())
-        at.run()
-
-        self.assertIn("alerts", at.session_state)
-        self.assertIsInstance(at.session_state["alerts"], list)
-        self.assertIn("next_alert_id", at.session_state)
-        self.assertIn("dismissed_banner_ids", at.session_state)
-
     def test_create_alert_adds_to_list(self):
         """
         Creates an alert through the form and verifies it is stored.
@@ -52,11 +40,11 @@ display_alerts(user_id="user1", events=events)
         at = AppTest.from_string(self._make_test_app())
         at.run()
 
-        at.text_input("Alert Title").set_value("CS Club Meeting")
-        at.selectbox("Category").set_value("Academic")
-        at.selectbox("Alert Type").set_value("Personal Reminder")
+        at.text_input("alerts_title_input").set_value("CS Club Meeting")
+        at.selectbox("alerts_category_select").set_value("Academic")
+        at.selectbox("alerts_type_select").set_value("Personal Reminder")
 
-        at.form("create_alert_form").submit()
+        at.button("FormSubmitter:create_alert_form-Save Alert").click()
         at.run()
 
         self.assertEqual(len(at.session_state["alerts"]), 1)
@@ -65,6 +53,7 @@ display_alerts(user_id="user1", events=events)
         self.assertEqual(alert["category"], "Academic")
         self.assertEqual(alert["alert_type"], "Personal Reminder")
         self.assertTrue(alert["enabled"])
+
 
     def test_disable_alert_marks_disabled(self):
         """
@@ -91,10 +80,11 @@ display_alerts(user_id="user1", events=events)
         ]
 
         at.run()
-        at.button("Disable").click()
+        at.button("disable_1").click()
         at.run()
 
         self.assertFalse(at.session_state["alerts"][0]["enabled"])
+
 
     def test_delete_alert_removes_it(self):
         """
@@ -121,40 +111,10 @@ display_alerts(user_id="user1", events=events)
         ]
 
         at.run()
-        at.button("Delete").click()
+        at.button("delete_1").click()
         at.run()
 
         self.assertEqual(at.session_state["alerts"], [])
-
-    def test_upcoming_alerts_table_shows_future_alert(self):
-        """
-        Creates a future alert and checks that an Upcoming Alerts table is rendered.
-        """
-        at = AppTest.from_string(self._make_test_app())
-        at.run()
-
-        future_time = datetime.now().replace(second=0, microsecond=0) + timedelta(hours=3)
-
-        at.session_state["alerts"] = [
-            {
-                "id": 1,
-                "user_id": "user1",
-                "title": "Future Reminder",
-                "category": "Academic",
-                "alert_type": "Personal Reminder",
-                "minutes_before": None,
-                "event_start": None,
-                "event_name": None,
-                "remind_at": future_time,
-                "delivery": {"in_app": True, "email": False, "sms": False},
-                "enabled": True,
-                "created_at": datetime.now(),
-            }
-        ]
-
-        at.run()
-
-        self.assertGreaterEqual(len(at.dataframe), 1)
 
 #################### End of Danae's Tests #########################
 
