@@ -10,7 +10,13 @@ from modules import display_my_custom_component, display_alerts
 from data_fetcher import get_user_posts, get_genai_advice, get_user_profile, get_user_sensor_data, get_user_workouts
 
 userId = 'user1'
-
+def register_pages():
+   """Put modules(pages)in the return statement  here"""
+   return[
+           st.Page(display_app_page, title = "Home", default= True),
+           st.Page("flyer_updater/view.py", title ="Flyer Updater"),
+           # NEW MODULES(pages) GO HERE vvvvvvvvv
+            ]
 
 def display_app_page():
     """Displays the home page of the app."""
@@ -44,4 +50,5 @@ def display_app_page():
 
 # This is the starting point for your app. You do not need to change these lines
 if __name__ == '__main__':
-    display_app_page()
+    nav = st.navigation(register_pages())
+    nav.run()
