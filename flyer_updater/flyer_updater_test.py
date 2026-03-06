@@ -1,9 +1,8 @@
 #############################################################################
-# TESTS FOR FLYER_UPDATER MODULE#############################################
+# TESTS FOR FLYER_UPDATER MODULE #############################################
 
 import unittest
 from streamlit.testing.v1 import AppTest
-#from modules import display_alerts
 class TestFlyerUpdater(unittest.TestCase):
 
     def test_page_renders(self):

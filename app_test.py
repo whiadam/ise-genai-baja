@@ -3,7 +3,7 @@
 ############################
 import unittest
 
-from flyer_updater.test_flyer_updater import TestFlyerUpdater
+from flyer_updater.flyer_updater_test import TestFlyerUpdater
 
 if __name__ == "__main__":
     unittest.main()
