@@ -2,15 +2,11 @@
 
 from datetime import datetime
 
-# simple in-memory storage (temporary)
+# In-memory database (used for tests)
 EVENTS_DB = []
 
 
 def create_event(title, description, location, event_type, department):
-    """
-    Create a new event and store it
-    """
-
     if not title or not location:
         raise ValueError("Title and location are required")
 
@@ -32,16 +28,10 @@ def create_event(title, description, location, event_type, department):
 
 
 def get_events():
-    """
-    Return all events
-    """
     return EVENTS_DB
 
 
 def get_event_by_id(event_id):
-    """
-    Find event by ID
-    """
     for event in EVENTS_DB:
         if event["event_id"] == event_id:
             return event
@@ -49,9 +39,6 @@ def get_event_by_id(event_id):
 
 
 def rsvp_event(event_id):
-    """
-    Increment RSVP count
-    """
     event = get_event_by_id(event_id)
 
     if event is None:
@@ -62,7 +49,4 @@ def rsvp_event(event_id):
 
 
 def clear_events():
-    """
-    ONLY for testing (resets DB)
-    """
     EVENTS_DB.clear()
