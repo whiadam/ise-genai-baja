@@ -22,7 +22,6 @@ selected = st.sidebar.selectbox("Select Building", building_names, index=0)
 # create dataframe
 df = pd.DataFrame(buildings)
 
-# 🔥 THIS IS THE KEY PART
 layer = pdk.Layer(
     "ScatterplotLayer",
     data=df,
