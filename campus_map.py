@@ -2,10 +2,11 @@
 
 import streamlit as st
 import pandas as pd
+import pydeck as pdk
 
 st.title("Campus Map")
 
-# building data (NO "None" in map data)
+# building data (exactly 5)
 buildings = [
     {"name": "Library", "lat": 33.881, "lon": -117.885, "type": "study"},
     {"name": "Student Union", "lat": 33.882, "lon": -117.883, "type": "social"},
@@ -14,15 +15,33 @@ buildings = [
     {"name": "Cafeteria", "lat": 33.885, "lon": -117.881, "type": "food"},
 ]
 
-# sidebar selectbox MUST include "None"
+# sidebar selectbox (must start with None)
 building_names = ["None"] + [b["name"] for b in buildings]
 selected = st.sidebar.selectbox("Select Building", building_names, index=0)
 
-# THIS PART IS CRITICAL 👇
-map_data = pd.DataFrame(buildings)[["lat", "lon"]]
+# create dataframe
+df = pd.DataFrame(buildings)
 
-# Use st.map EXACTLY like this
-st.map(map_data)
+# 🔥 THIS IS THE KEY PART
+layer = pdk.Layer(
+    "ScatterplotLayer",
+    data=df,
+    get_position='[lon, lat]',
+    get_radius=100,
+)
+
+view_state = pdk.ViewState(
+    latitude=33.882,
+    longitude=-117.884,
+    zoom=15,
+)
+
+deck = pdk.Deck(
+    layers=[layer],
+    initial_view_state=view_state,
+)
+
+st.pydeck_chart(deck)
 
 # selection logic
 for b in buildings:
