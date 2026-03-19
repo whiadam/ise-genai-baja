@@ -1,13 +1,20 @@
 # create_events.py
 
 from datetime import datetime
-from data_fetcher import insert_event, get_events, update_event
 
-# create a new event
+# simple in-memory storage (temporary)
+EVENTS_DB = []
+
+
 def create_event(title, description, location, event_type, department):
-    events = get_events()
+    """
+    Create a new event and store it
+    """
 
-    event_id = len(events) + 1  # simple ID system
+    if not title or not location:
+        raise ValueError("Title and location are required")
+
+    event_id = len(EVENTS_DB) + 1
 
     event = {
         "event_id": event_id,
@@ -20,23 +27,42 @@ def create_event(title, description, location, event_type, department):
         "rsvp_count": 0
     }
 
-    insert_event(event)
+    EVENTS_DB.append(event)
     return event
 
 
-# get all events
-def list_events():
-    return get_events()
+def get_events():
+    """
+    Return all events
+    """
+    return EVENTS_DB
 
 
-# RSVP to event
-def rsvp_event(event_id):
-    events = get_events()
-
-    for event in events:
+def get_event_by_id(event_id):
+    """
+    Find event by ID
+    """
+    for event in EVENTS_DB:
         if event["event_id"] == event_id:
-            event["rsvp_count"] += 1
-            update_event(event)
             return event
-
     return None
+
+
+def rsvp_event(event_id):
+    """
+    Increment RSVP count
+    """
+    event = get_event_by_id(event_id)
+
+    if event is None:
+        raise ValueError("Event not found")
+
+    event["rsvp_count"] += 1
+    return event
+
+
+def clear_events():
+    """
+    ONLY for testing (resets DB)
+    """
+    EVENTS_DB.clear()
