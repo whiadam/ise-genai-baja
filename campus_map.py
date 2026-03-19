@@ -20,7 +20,7 @@ selected = st.sidebar.selectbox("Select Building", building_names, index=0)
 
 # map data (must be 5 markers)
 map_data = pd.DataFrame(
-    [{"lat": b["lat"], "lon": b["lon"]} for b in buildings]
+    [{"lat": b["lat"], "lon": b["lon"]} for b in buildings if b["name"] != "None"]
 )
 
 st.map(map_data)
