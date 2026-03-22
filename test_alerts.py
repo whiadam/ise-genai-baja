@@ -16,7 +16,7 @@ class TestAlertsModule(unittest.TestCase):
         return """
 import streamlit as st
 from datetime import datetime, timedelta
-from modules import display_alerts
+from alerts import display_alerts
 
 events = [{"name": "Test Event", "start": datetime.now().replace(second=0, microsecond=0) + timedelta(hours=2)}]
 
