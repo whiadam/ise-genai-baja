@@ -25,10 +25,6 @@ def display_app_page():
     profile = get_user_profile(userId)
     st.caption(f"Logged in as @{profile['username']}")
 
-    # An example of displaying a custom component called "my_custom_component"
-    value = st.text_input('Enter your name')
-    display_my_custom_component(value)
-
     st.divider()
 
     # Example events list (later this can come from the Create Events module) 
