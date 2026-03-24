@@ -7,6 +7,7 @@
 
 import streamlit as st
 from alerts_module.alerts import display_alerts
+from flyer_updater.view import display_flyer_updater_page
 from data_fetcher import get_user_posts, get_genai_advice, get_user_profile, get_user_sensor_data, get_user_workouts
 
 userId = 'user1'
@@ -14,7 +15,7 @@ def register_pages():
    """Put modules(pages)in the return statement  here"""
    return[
            st.Page(display_app_page, title = "Home", default= True),
-           st.Page("flyer_updater/view.py", title ="Flyer Updater"),
+           st.Page(display_flyer_updater_page, title ="Flyer Updater"),
            # NEW MODULES(pages) GO HERE vvvvvvvvv
             ]
 
