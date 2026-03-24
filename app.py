@@ -6,7 +6,7 @@
 #############################################################################
 
 import streamlit as st
-from alerts import display_alerts
+from alerts_module.alerts import display_alerts
 from data_fetcher import get_user_posts, get_genai_advice, get_user_profile, get_user_sensor_data, get_user_workouts
 
 userId = 'user1'
