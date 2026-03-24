@@ -2,6 +2,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 import data_fetcher
 
+with patch("google.cloud.bigquery.Client"):
+    import data_fetcher
 
 class TestDataFetcher(unittest.TestCase):
 
