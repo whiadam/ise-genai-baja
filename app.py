@@ -19,6 +19,7 @@ def register_pages():
         st.Page(display_app_page, title="Home", default=True),
         st.Page(display_flyer_updater_page, title="Flyer Updater"),
         st.Page("campus_voice.py", title="Campus Voice"),
+        st.Page(display_alerts, title ="Alerts")
     ]
 
 
