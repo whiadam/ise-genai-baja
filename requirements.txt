@@ -1,4 +1,6 @@
 streamlit>=1.28.0
 folium
 streamlit-folium
+google-cloud-bigquery
+google-cloud-aiplatform
 
