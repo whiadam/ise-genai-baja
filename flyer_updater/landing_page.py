@@ -11,6 +11,8 @@ def render_landing_page():
 
     camera_image = st.camera_input("Or take a photo")
 
+    image = uploaded_file or camera_image
+
     if uploaded_file:
         st.image(uploaded_file, caption="Uploaded Flyer", use_container_width=True)
     elif camera_image:
