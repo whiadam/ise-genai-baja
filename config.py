@@ -8,8 +8,14 @@ PROJECT_DATASET = f"{PROJECT_ID}.{DATASET}"
 
 _client = None
 
-def get_client():
+def _get_client():
     global _client
     if _client is None:
         _client = bigquery.Client(project = PROJECT_ID)
     return _client
+
+def run_query(query, params=None):
+    job_config = None
+    if params:
+        job_config = bigquery.QueryJobConfig(query_parameters=params)
+    return _get_client().query(query, job_config=job_config).result
