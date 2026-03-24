@@ -1,6 +1,6 @@
 # use AI for templating
 import streamlit as st
-from .landing_page import render_landing_page
+from .flyer_landing_page import render_landing_page
 
 def display_flyer_updater_page():
     tab1, tab2 = st.tabs(["Upload a Photo", "Flyer Log"])

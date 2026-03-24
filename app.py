@@ -7,7 +7,7 @@
 
 import streamlit as st
 from alerts_module.alerts import display_alerts
-from flyer_updater.view import display_flyer_updater_page
+from flyer_updater.flyer_view import display_flyer_updater_page
 from data_fetcher import get_active_polls, get_issues, get_genai_data
 
 userId = 'user1'

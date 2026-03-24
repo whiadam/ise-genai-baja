@@ -1,6 +1,3 @@
-#############################################################################
-# TESTS FOR FLYER_UPDATER MODULE #############################################
-
 import unittest
 from pathlib import Path
 from streamlit.testing.v1 import AppTest
@@ -15,7 +12,7 @@ class TestFlyerUpdater(unittest.TestCase):
     
     @staticmethod
     def _render_page():
-        from flyer_updater.view import display_flyer_updater_page
+        from flyer_updater.flyer_view import display_flyer_updater_page
         display_flyer_updater_page()
 
     def test_page_renders(self):
