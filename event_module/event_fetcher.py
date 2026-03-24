@@ -11,7 +11,7 @@ def get_events():
     """
     return [Event(**dict(row.items())) for row in run_query(query)]
 
-def get_upcomming_events():
+def get_upcoming_events():
     query = f"""
         SELECT * FROM `{PROJECT_DATASET}.events`
         WHERE event_starttime >= CURRENT_TIMESTAMP()
