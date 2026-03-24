@@ -1,75 +1,53 @@
-#############################################################################
-# app.py
-#
-# This file contains the entrypoint for the app.
-#
-#############################################################################
-
 import streamlit as st
+from data_fetcher import (
+    get_active_polls,
+    get_issues,
+    get_filtered_issues,
+    get_facility_ratings,
+)
 
-def display_report_issue():
-    """Display the report issue card."""
-    st.subheader("Report an Issue")
-    issue = st.text_area("Describe the issue (e.g., bathroom is dirty):")
-    if st.button("Report Now"):
-        st.success("Issue reported successfully!")
+st.title("Campus Voice")
 
-def display_rate_facility():
-    """Display the rate facility card."""
-    st.subheader("Rate a Facility")
-    rating = st.slider("Rate (1-5 stars):", 1, 5)
-    comments = st.text_area("Additional comments:")
-    if st.button("Rate Now"):
-        st.success("Thank you for your feedback!")
+st.subheader("Report an Issue")
+issue_title = st.text_input("Issue title")
+issue_description = st.text_area("Describe the issue")
+issue_rating = st.slider("How serious is it? (1-5)", 1, 5)
 
-def display_vote_poll():
-    """Display the vote in a poll card."""
-    st.subheader("Vote in a Poll")
-    options = ["Dining Hall Specials", "Campus Events", "Library Hours"]
-    selected_option = st.selectbox("Choose a poll to vote on:", options)
+if st.button("Report Now"):
+    if issue_title.strip() and issue_description.strip():
+        st.success("Issue submitted to the app flow.")
+    else:
+        st.warning("Please enter both a title and description.")
+
+st.subheader("Vote in a Poll")
+polls = get_active_polls()
+if polls:
+    poll_options = [poll["poll_question"] for poll in polls]
+    selected_poll = st.selectbox("Choose a poll", poll_options)
     if st.button("Vote"):
-        st.success(f"You voted for: {selected_option}")
+        st.success(f"You voted for: {selected_poll}")
+else:
+    st.info("No active polls right now.")
 
-def display_campus_buzz():
-    """Display trending issues and popular polls."""
-    st.subheader("Campus Buzz")
-    trending_issues = ["Vending machine is broken", "Library noise complaints"]
-    popular_polls = ["What food do you want this week?"]
+st.subheader("Facility Ratings")
+ratings = get_facility_ratings()
+if ratings:
+    for rating in ratings[:5]:
+        st.write(
+            f"- {rating['facility_name']}: {rating['rating']}/5 — {rating['comment']}"
+        )
+else:
+    st.write("No ratings yet.")
 
-    st.write("### Trending Issues")
-    for issue in trending_issues:
-        st.write(f"- {issue} [Upvote]")
+st.subheader("Campus Issues")
+min_rating = st.selectbox("Show issues with rating at least", [1, 2, 3, 4, 5])
 
-    st.write("### Popular Polls")
-    for poll in popular_polls:
-        st.write(f"- {poll} [Upvote]")
+filtered_issues = get_filtered_issues(min_rating)
 
-def display_filters():
-    """Display category filters."""
-    st.subheader("Filters")
-    filters = ["All", "Cleanliness", "Food", "Safety", "Maintenance", "Events"]
-    selected_filter = st.selectbox("Select a category:", filters)
-
-def display_app_page():
-    """Displays the home page of the app."""
-    st.title("Campus Voice")
-
-    # Action Cards
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        display_report_issue()
-
-    with col2:
-        display_rate_facility()
-
-    with col3:
-        display_vote_poll()
-
-    display_campus_buzz()
-    display_filters()
-
-
-# This is the starting point for my app. I had AI help with generating some of the code since i couldn't find a streamlit format.
-if __name__ == '__main__':
-    display_app_page()
+if filtered_issues:
+    for issue in filtered_issues[:5]:
+        st.write(f"### {issue['title']}")
+        st.write(issue["description"])
+        st.caption(f"Rating: {issue['rating']} | Timestamp: {issue['timestamp']}")
+else:
+    st.write("No issues match this filter.")
