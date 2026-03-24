@@ -1,5 +1,4 @@
 from google.cloud import bigquery
-
 PROJECT_ID = "jeffrey-perparas-csu-fullerton"
 DATASET = "campus_event_tracker"
 VERTEX_LOCATION = "us-central1"
@@ -8,14 +7,14 @@ PROJECT_DATASET = f"{PROJECT_ID}.{DATASET}"
 
 _client = None
 
-def _get_client():
+def get_client():
     global _client
     if _client is None:
         _client = bigquery.Client(project = PROJECT_ID)
     return _client
 
-def run_query(query, params=None):
+def run_query(query ,params = None):
     job_config = None
     if params:
         job_config = bigquery.QueryJobConfig(query_parameters=params)
-    return _get_client().query(query, job_config=job_config).result
+    return get_client().query(query, job_config=job_config).result()
