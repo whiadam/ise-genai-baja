@@ -10,8 +10,13 @@ VIEW_PATH = str(Path(__file__).parent / "view.py")
 class TestFlyerUpdater(unittest.TestCase):
 
     def setUp(self):
-       self.at = AppTest.from_file(str(Path(__file__).parent / "view.py"))
+       self.at = AppTest.from_function(self._render_page)
        self.at.run()
+    
+    @staticmethod
+    def _render_page():
+        from flyer_updater.view import display_flyer_updater_page
+        display_flyer_updater_page()
 
     def test_page_renders(self):
         self.assertFalse(self.at.exception)
