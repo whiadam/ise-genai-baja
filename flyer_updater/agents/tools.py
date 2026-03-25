@@ -7,7 +7,7 @@ from event_module.event_fetcher import create_event, get_upcoming_events
 from flyer_updater.flyer import Flyer
 from flyer_updater.flyer_fetcher import create_flyer
 
-def check_duplicate_event(tool_context: ToolContext)-> str:
+def check_duplicate_event()->str:
     """Gets all upcoming events for duplicate checking.
         
         Returns:
@@ -31,7 +31,6 @@ def insert_event(
         confidence_scores: dict,
         require_user_input: bool,
         fields_edited: list,
-        tool_context: ToolContext
     )->str:
     """Create an event and flyer record from extracted flyer data.
     event and flyer IDs are auto-generated *Do Not Provide ID* 
@@ -81,9 +80,3 @@ def insert_event(
 
     return f"Event *{event_title}* was created with Event ID: {event_id} and Flyer ID:{flyer_id}"
             
-
-
-
-
-
-
