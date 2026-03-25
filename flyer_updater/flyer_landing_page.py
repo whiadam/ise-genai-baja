@@ -1,25 +1,46 @@
-import streamlit as st  
+import streamlit as st
+import uuid
+from flyer_updater.agents.agent_service import query_agent, get_or_create_session
 
 def render_landing_page():
     st.title("Flyer Updater")
 
-    uploaded_file = st.file_uploader(
-        "Upload a flyer image",
-        type=["png", "jpg", "jpeg", "pdf"],
-        accept_multiple_files=False,
-    )
+    if "user_id" not in st.session_state:
+        st.session_state.user_id = str(uuid.uuid4())
+    if "session_id" not in st.session_state:
+        st.session_state.session_id = get_or_create_session(st.session_state.user_id)
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
 
-    camera_image = st.camera_input("Or take a photo")
+    input_method = st.radio("Take a picture or Upload a file", ["Upload", "Camera"], horizontal=True)
 
-    image = uploaded_file or camera_image
+    col1, col2 = st.columns(2)
 
-    if uploaded_file:
-        st.image(uploaded_file, caption="Uploaded Flyer", use_container_width=True)
-    elif camera_image:
-        st.image(camera_image, caption="Captured Photo", use_container_width=True)
-
-    if st.button("Submit"):
-        if uploaded_file or camera_image:
-            st.success("Flyer submitted successfully!")
+    with col1:
+        if input_method == "Upload":
+            image = st.file_uploader("Upload an image of a flyer", type=["png","jpg","jpeg"])
         else:
-            st.warning("Please upload or capture an image first.")
+            image = st.camera_input("Snap a Shot")
+    with col2:
+        audio = st.audio_input("Speak!")
+
+    for msg in st.session_state.messages:
+        with st.chat_message(msg["role"]):
+            st.write(msg["content"])
+
+    if prompt := st.chat_input("Upload a Photo or Audio or use the chat to create an event") 
+        st.session_state.messages.append({"role":"user", "content":prompt})
+        with st.chat_message("user"):
+            st.write(prompt)
+        with st.chat_message("assistant"):
+            with st.spinner("Working..."):
+                response = query_agent(
+                        user_id=st.session_state.user_id,
+                        session_id=st.session_state.session_id,
+                        message=prompt,
+                        image=image,
+                        audio=audio
+                        )
+                st.write(response)
+                st.session_state.messages.append({"role": "assistant","content": response})
+
