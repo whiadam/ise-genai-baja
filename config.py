@@ -2,7 +2,7 @@ from google.cloud import bigquery
 PROJECT_ID = "jeffrey-perparas-csu-fullerton"
 DATASET = "campus_event_tracker"
 VERTEX_LOCATION = "us-central1"
-MODEL_NAME = "gemini-2.0-flash"
+MODEL_NAME = "gemini-2.5-flash"
 PROJECT_DATASET = f"{PROJECT_ID}.{DATASET}"
 
 _client = None
