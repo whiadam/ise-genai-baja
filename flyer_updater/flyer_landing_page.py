@@ -24,7 +24,6 @@ def render_landing_page():
     with col2:
         audio = st.audio_input("Speak!")
 
-    chat_container= st.container()
 
     has_media = image or audio
     if has_media: 
@@ -37,22 +36,27 @@ def render_landing_page():
         else:
             label = "Process audio"
             display="[Audio Note]"
-        if st.button(label):
-            st.session_state.messages.append({"role":"user", "content": display})
-            with chat_container:
-                with st.chat_message("user"):
-                    st.write(display)
-                with st.chat_message("assistant"):
-                    with st.spinner("Working..."):
-                        response = query_agent(
-                                user_id=st.session_state.user_id,
-                                session_id=st.session_state.session_id,
-                                message="",
-                                image=image,
-                                audio=audio
-                                )
-                        st.write(response)
-                        st.session_state.message.append({"role": "assistant", "content": response})
+        submit_media = st.button(label)
+    else:
+        submit_media = False
+
+    chat_container= st.container()
+    if submit_media:
+        st.session_state.messages.append({"role":"user", "content": display})
+        with chat_container:
+            with st.chat_message("user"):
+                st.write(display)
+            with st.chat_message("assistant"):
+                with st.spinner("Working..."):
+                    response = query_agent(
+                            user_id=st.session_state.user_id,
+                            session_id=st.session_state.session_id,
+                            message="",
+                            image=image,
+                            audio=audio
+                            )
+                    st.write(response)
+                    st.session_state.messages.append({"role": "assistant", "content": response})
 
 
     with chat_container: 
