@@ -14,12 +14,12 @@ class TestAgentService(unittest.TestCase):
         mock_event.is_final_response.return_value = True
         mock_event.content.parts = [MagicMock(text="Extracted event data")]
 
-        async def fake_run(**kwargs):
+        async def fake_run(**_):
             yield mock_event
 
         mock_runner.run_async = fake_run
 
-        result = agent_service.query_agent("user1", "session1", "extract this")
+        result = str(agent_service.query_agent("user1", "session1", "extract this"))
         self.assertIn("Extracted", result)
 
     @patch("flyer_updater.agents.agent_service.runner")
@@ -28,7 +28,7 @@ class TestAgentService(unittest.TestCase):
         mock_event.is_final_response.return_value = False
         mock_event.content = None
 
-        async def fake_run(**kwargs):
+        async def fake_run(**_):
             yield mock_event
 
         mock_runner.run_async = fake_run
@@ -42,7 +42,7 @@ class TestAgentService(unittest.TestCase):
         mock_event.is_final_response.return_value = True
         mock_event.content.parts = [MagicMock(text="Found: Spring Concert")]
 
-        async def fake_run(**kwargs):
+        async def fake_run(**_):
             yield mock_event
 
         mock_runner.run_async = fake_run
@@ -51,7 +51,7 @@ class TestAgentService(unittest.TestCase):
         mock_image.getvalue.return_value = b"fake_image_bytes"
         mock_image.type = "image/png"
 
-        result = agent_service.query_agent("user1", "session1", "extract this", image=mock_image)
+        result = str(agent_service.query_agent("user1", "session1", "extract this", image=mock_image))
         self.assertIn("Spring Concert", result)
 
     @patch("flyer_updater.agents.agent_service.runner")
@@ -60,7 +60,7 @@ class TestAgentService(unittest.TestCase):
         mock_event.is_final_response.return_value = True
         mock_event.content.parts = [MagicMock(text="Department is CS")]
 
-        async def fake_run(**kwargs):
+        async def fake_run(**_):
             yield mock_event
 
         mock_runner.run_async = fake_run
@@ -69,7 +69,7 @@ class TestAgentService(unittest.TestCase):
         mock_audio.getvalue.return_value = b"fake_audio_bytes"
         mock_audio.type = "audio/wav"
 
-        result = agent_service.query_agent("user1", "session1", "listen to this", audio=mock_audio)
+        result = str(agent_service.query_agent("user1", "session1", "listen to this", audio=mock_audio))
         self.assertIn("CS", result)
 
     @patch("flyer_updater.agents.agent_service.session_service")
