@@ -22,7 +22,7 @@ def get_upcoming_events():
     query = f"""
         SELECT * FROM `{PROJECT_DATASET}.events`
         WHERE event_startime >= CURRENT_TIMESTAMP()
-        ORDER BY event_starttime ASC
+        ORDER BY event_startime ASC
     """
     return [Event(**dict(row.items())) for row in run_query(query)]
 
