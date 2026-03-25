@@ -9,7 +9,7 @@ def get_flyers():
     return [Flyer(**dict(row.items())) for row in run_query(query)]
 
 def create_flyer(flyer:Flyer)-> int:
-    table = f"`{PROJECT_DATASET}.flyer_data`"
+    table = f"{PROJECT_DATASET}.flyer_data"
     row = {k: v.isoformat() if isinstance(v,datetime) else v for k, v in asdict(flyer).items()}
     if row.get("confidence_scores"):
         row["confidence_scores"] = json.dumps(row["confidence_scores"])

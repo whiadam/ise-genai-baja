@@ -42,7 +42,7 @@ def get_events_by_department(department):
 def create_event(event:Event)->int:
     if event.event_id is None:
         event.event_id = get_next_event_id()
-    table = f"`{PROJECT_DATASET}.events`"
+    table = f"{PROJECT_DATASET}.events"
     row = {k: v.isoformat() if isinstance(v,datetime) else v for k,v in asdict(event).items()} 
     errors = get_client().insert_rows_json(table, [row])
     if errors:
