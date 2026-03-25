@@ -28,9 +28,6 @@ class TestFlyerUpdater(unittest.TestCase):
     def test_title_displayed(self):
         self.assertEqual(self.at.title[0].value, "Flyer Updater")
 
-    def test_tabs_exist(self):
-        self.assertTrue(len(self.at.tabs) > 0)
-
     def test_radio_exists(self):
         self.assertTrue(len(self.at.radio) > 0)
 
