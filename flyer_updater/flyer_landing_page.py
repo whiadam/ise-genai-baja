@@ -26,10 +26,12 @@ def render_landing_page():
 
 
     has_media = image or audio
+    if not has_media:
+        st.session_state.media_submitted = False
     if has_media: 
         if image and audio:
             label = "Process image and audio"
-            diplay = "[Uploaded Image with Audio note]"
+            display = "[Uploaded Image with Audio note]"
         elif image:
             label = "Extract from image"
             display = "[Uploaded Image]"
@@ -42,6 +44,7 @@ def render_landing_page():
 
     chat_container= st.container()
     if submit_media:
+        st.session_state.media_submitted = True
         st.session_state.messages.append({"role":"user", "content": display})
         with chat_container:
             with st.chat_message("user"):
@@ -61,8 +64,8 @@ def render_landing_page():
 
     with chat_container: 
         for msg in st.session_state.messages:
-         with st.chat_message(msg["role"]):
-            st.write(msg["content"])
+            with st.chat_message(msg["role"]):
+                 st.write(msg["content"])
 
     if prompt := st.chat_input("Upload a Photo or Audio or use the chat to create an event"): 
         st.session_state.messages.append({"role":"user", "content":prompt})
