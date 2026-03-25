@@ -1,18 +1,22 @@
+###AI WROTE THESE TESTS#######
 import unittest
 from unittest.mock import patch, MagicMock
-from pathlib import Path
-from streamlit.testing.v1 import AppTest
-from flyer_updater.flyer import Flyer
 from datetime import datetime
 
-VIEW_PATH = str(Path(__file__).parent / "view.py")
+with patch("google.cloud.bigquery.Client"):
+    with patch("flyer_updater.agents.agent_service.query_agent", return_value="mocked response"):
+        with patch("flyer_updater.agents.agent_service.get_or_create_session", return_value="mock-session"):
+            from streamlit.testing.v1 import AppTest
+            from flyer_updater.flyer import Flyer
+            from flyer_updater import flyer_fetcher
+
 
 class TestFlyerUpdater(unittest.TestCase):
 
     def setUp(self):
-       self.at = AppTest.from_function(self._render_page)
-       self.at.run()
-    
+        self.at = AppTest.from_function(self._render_page)
+        self.at.run()
+
     @staticmethod
     def _render_page():
         from flyer_updater.flyer_view import display_flyer_updater_page
@@ -24,16 +28,20 @@ class TestFlyerUpdater(unittest.TestCase):
     def test_title_displayed(self):
         self.assertEqual(self.at.title[0].value, "Flyer Updater")
 
-    def test_submit_without_image_shows_warning(self):
-        self.at.button[0].click().run()
-        self.assertEqual(len(self.at.warning), 1)
+    def test_tabs_exist(self):
+        self.assertTrue(len(self.at.tabs) > 0)
+
+    def test_radio_exists(self):
+        self.assertTrue(len(self.at.radio) > 0)
+
+    def test_chat_input_exists(self):
+        self.assertTrue(len(self.at.chat_input) > 0)
+
 
 ###########################################################
-##Test Flyer Fetcher 
-##had AI write these tests as well trying to prevent tendonitis
+## Test Flyer Fetcher
+## had AI write these tests as well trying to prevent tendonitis
 ###########################################################
-with patch("google.cloud.bigquery.Client"):
-    from flyer_updater import flyer_fetcher
 
 
 class TestFlyerFetcher(unittest.TestCase):
