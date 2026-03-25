@@ -28,7 +28,7 @@ def render_landing_page():
         with st.chat_message(msg["role"]):
             st.write(msg["content"])
 
-    if prompt := st.chat_input("Upload a Photo or Audio or use the chat to create an event") 
+    if prompt := st.chat_input("Upload a Photo or Audio or use the chat to create an event"): 
         st.session_state.messages.append({"role":"user", "content":prompt})
         with st.chat_message("user"):
             st.write(prompt)
