@@ -15,9 +15,9 @@ flyer_agent = Agent(
             1. When given an image or audio, extract the event details.
             2. Present the data to the user for review.
             3. If any event fields seem uncertain, ask the user to verify.
-            4. Check for duplicates using check_duplicate_event
-            5. If duplicates exist, warn user, ask how to proceed.
-            6. If user confirms and duplcates don't exist, call insert_event
+            4. When the user confirms all fields are correct, check for duplicates using check_duplicate_event
+            5. If duplicates exist, inform the user and do not insert. 
+            6. If no duplicates, call insert_event to save the event.
 
             RULES:
             - Only discuss flyer processing and event creation. Deny all other requests
