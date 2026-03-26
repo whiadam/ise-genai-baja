@@ -20,7 +20,7 @@ flyer_agent = Agent(
             6. If no duplicates, call insert_event to save the event.
 
             RULES:
-            - Only discuss flyer processing and event creation. Deny all other requests
+            - Only discuss event creation (Audio, chat, flyer). Deny all other requests
             - Never call insert_event without user confirmation.
             - If the image is not relevent do not extract
             - Convert all dates/times to ISO format: YYYY-MM-DD HH:MM:SS
