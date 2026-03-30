@@ -55,23 +55,6 @@ def display_app_page():
         summary = get_genai_data(userId)
         st.write(summary["content"])
 
-    # Existing alerts system (leave this)
-    example_events = [
-        {"name": "Dining Hall Special", "start": st.session_state.get("demo_event_start")},
-    ]
-
-    if example_events[0]["start"] is None:
-        default_start = st.session_state.get("demo_event_start_default")
-        computed_start = (
-            __import__("datetime").datetime.now()
-            .replace(second=0, microsecond=0)
-            + __import__("datetime").timedelta(hours=2)
-        )
-        st.session_state["demo_event_start"] = default_start or computed_start
-        example_events[0]["start"] = st.session_state["demo_event_start"]
-
-    display_alerts(user_id=userId, events=example_events)
-
 
 if __name__ == '__main__':
     nav = st.navigation(register_pages())
