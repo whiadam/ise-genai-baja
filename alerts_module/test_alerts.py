@@ -14,14 +14,18 @@ class TestAlertsModule(unittest.TestCase):
         Returns a minimal Streamlit app as a string that renders display_alerts().
         """
         return """
-import streamlit as st
-from datetime import datetime, timedelta
-from alerts_module.alerts import display_alerts
+    import streamlit as st
+    from datetime import datetime, timedelta
 
-events = [{"name": "Test Event", "start": datetime.now().replace(second=0, microsecond=0) + timedelta(hours=2)}]
+    try:
+        from alerts_module.alerts import display_alerts
+    except ModuleNotFoundError:
+        from alerts import display_alerts
 
-display_alerts(user_id="user1", events=events)
-"""
+    events = [{"name": "Test Event", "start": datetime.now().replace(second=0, microsecond=0) + timedelta(hours=2)}]
+
+    display_alerts(user_id="user1", events=events)
+    """
 
     def test_create_alert_adds_to_list(self):
         """

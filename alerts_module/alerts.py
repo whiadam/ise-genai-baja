@@ -32,7 +32,7 @@ def _parse_dt(d: date, t: time) -> datetime:
 
     Lines vibe-coded with GPT-5.2 Thinking.
     """
-    return datetime(d.year, d.month, d.day, t.hour, t.minute, 0)
+    return datetime(d.year, d.month, d.day, t.hour, t.minute, 0, tzinfo=timezone.utc)
 
 
 def _compute_trigger_time(alert: dict[str, Any]) -> datetime | None:
@@ -57,7 +57,7 @@ def _compute_trigger_time(alert: dict[str, Any]) -> datetime | None:
         return event_start - timedelta(minutes=minutes_before)
 
     if alert_type == "Campus Announcement":
-        return datetime.now()
+        return datetime.now(timezone.utc)
 
     return None
 
