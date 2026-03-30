@@ -1,6 +1,5 @@
 from datetime import datetime
 from dataclasses import asdict
-from numpy import require
 from event_module.event import Event
 from event_module.event_fetcher import create_event, get_upcoming_events
 from flyer_updater.flyer import Flyer
