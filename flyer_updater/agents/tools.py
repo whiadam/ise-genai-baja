@@ -1,6 +1,5 @@
 from datetime import datetime
 from dataclasses import asdict
-from google.adk.tools.tool_context import ToolContext
 from numpy import require
 from event_module.event import Event
 from event_module.event_fetcher import create_event, get_upcoming_events
@@ -58,8 +57,8 @@ def insert_event(
             time_created=now,
             event_title=event_title if event_title else None,
             event_location=event_location if event_location else None,
-            event_startime=datetime.fromisoformat(event_startime) if event_location else None,
-            event_endtime=datetime.fromisoformat(event_endtime) if event_location else None,
+            event_startime=datetime.fromisoformat(event_startime) if event_startime else None,
+            event_endtime=datetime.fromisoformat(event_endtime) if event_endtime else None,
             department=department if department else None,
             description=description if description else None,
             creator=creator 
