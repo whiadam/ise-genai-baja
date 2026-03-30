@@ -1,6 +1,6 @@
 #################### Imports #####################################
 from __future__ import annotations
-from datetime import datetime, date, time, timedelta
+from datetime import datetime, date, time, timedelta, timezone
 from typing import Any
 
 import streamlit as st
@@ -76,9 +76,9 @@ def _normalize_bigquery_alerts(bigquery_alerts: list[dict[str, Any]]) -> list[di
 
         if isinstance(alert_time, str):
             try:
-                alert_time = datetime.fromisoformat(alert_time.replace("Z", ""))
+                alert_time = datetime.fromisoformat(alert_time.replace("Z", "+00:00"))
             except ValueError:
-                alert_time = datetime.now()
+                alert_time = datetime.now(timezone.utc)
 
         if "Email" in preferences or "Text" in preferences:
             category = "Academic"
@@ -128,7 +128,7 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
     """
     _ensure_alert_state()
     events = events or []
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
 
     try:
         bigquery_alerts = get_all_alerts()
