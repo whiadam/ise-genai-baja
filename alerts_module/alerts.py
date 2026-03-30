@@ -1,10 +1,11 @@
 #################### Imports #####################################
-from __future__ import annotations  
-from datetime import datetime, date, time, timedelta  
-from typing import Any  
+from __future__ import annotations
+from datetime import datetime, date, time, timedelta
+from typing import Any
 
-import streamlit as st 
-from internals import create_component
+import streamlit as st
+from alerts_fetcher import get_all_alerts
+
 ##################### Danae's Section ############################
 def _ensure_alert_state() -> None:
     """
@@ -26,7 +27,7 @@ def _parse_dt(d: date, t: time) -> datetime:
     """
     Combines date + time into a datetime.
 
-    Lines vibe-coded with GPT-5.2 Thinking.    
+    Lines vibe-coded with GPT-5.2 Thinking.
     """
     return datetime(d.year, d.month, d.day, t.hour, t.minute, 0)
 
@@ -58,6 +59,58 @@ def _compute_trigger_time(alert: dict[str, Any]) -> datetime | None:
     return None
 
 
+def _normalize_bigquery_alerts(bigquery_alerts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    Converts BigQuery alert rows into the format used by display_alerts.
+
+    Lines vibe-coded with GPT-5.2 Thinking.
+    """
+    normalized_alerts = []
+
+    for alert in bigquery_alerts:
+        preferences = alert.get("preference", [])
+        alert_time = alert.get("time_of_alert")
+
+        if isinstance(alert_time, str):
+            try:
+                alert_time = datetime.fromisoformat(alert_time.replace("Z", ""))
+            except ValueError:
+                alert_time = datetime.now()
+
+        if "Email" in preferences or "Text" in preferences:
+            category = "Academic"
+        elif "None" in preferences:
+            category = "Other"
+        else:
+            category = "Other"
+
+        normalized_alerts.append(
+            {
+                "id": f"db_{alert['alert_id']}",
+                "user_id": "database_user",
+                "title": alert.get("alert_name", "Untitled Alert"),
+                "category": category,
+                "alert_type": "Personal Reminder" if alert.get("reoccuring") else "Campus Announcement",
+                "minutes_before": None,
+                "event_start": None,
+                "event_name": f"Event {alert['event_id']}" if alert.get("event_id") is not None else None,
+                "remind_at": alert_time,
+                "delivery": {
+                    "in_app": True,
+                    "email": "Email" in preferences,
+                    "sms": "Text" in preferences,
+                },
+                "enabled": True,
+                "created_at": alert_time,
+                "source": "database",
+                "alert_description": alert.get("alert_description"),
+                "event_id": alert.get("event_id"),
+            }
+        )
+
+    return normalized_alerts
+
+
 def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None = None) -> None:
     """
     Displays and manages alerts for the Campus Info App.
@@ -74,10 +127,20 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
     events = events or []
     now = datetime.now()
 
+    try:
+        bigquery_alerts = get_all_alerts()
+        database_alerts = _normalize_bigquery_alerts(bigquery_alerts)
+    except Exception as e:
+        st.warning(f"Could not load alerts from BigQuery: {e}")
+        database_alerts = []
+
+    local_alerts = st.session_state["alerts"]
+    all_alerts = database_alerts + local_alerts
+
     # =======================
     # Top Notification Banner
     # =======================
-    enabled_alerts = [a for a in st.session_state["alerts"] if a.get("enabled", True)]
+    enabled_alerts = [a for a in all_alerts if a.get("enabled", True)]
     upcoming_pairs = []
     for a in enabled_alerts:
         tt = _compute_trigger_time(a)
@@ -95,7 +158,9 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
             with left:
                 st.write("🔔")
             with mid:
-                st.warning(f"Alert: **{next_alert['title']}** triggers in **{mins} min** at {next_time.strftime('%I:%M %p')}")
+                st.warning(
+                    f"Alert: **{next_alert['title']}** triggers in **{mins} min** at {next_time.strftime('%I:%M %p')}"
+                )
             with right:
                 if st.button("✕", key=f"dismiss_{next_id}"):
                     st.session_state["dismissed_banner_ids"].add(next_id)
@@ -166,20 +231,25 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
             if not title.strip():
                 st.error("Alert title required.")
             else:
-                st.session_state["alerts"].append({
-                    "id": st.session_state["next_alert_id"],
-                    "user_id": user_id,
-                    "title": title.strip(),
-                    "category": category,
-                    "alert_type": alert_type,
-                    "minutes_before": minutes_before,
-                    "event_start": event_start,
-                    "event_name": event_name,
-                    "remind_at": remind_at,
-                    "delivery": {"in_app": in_app, "email": email, "sms": sms},
-                    "enabled": True,
-                    "created_at": datetime.now(),
-                })
+                st.session_state["alerts"].append(
+                    {
+                        "id": st.session_state["next_alert_id"],
+                        "user_id": user_id,
+                        "title": title.strip(),
+                        "category": category,
+                        "alert_type": alert_type,
+                        "minutes_before": minutes_before,
+                        "event_start": event_start,
+                        "event_name": event_name,
+                        "remind_at": remind_at,
+                        "delivery": {"in_app": in_app, "email": email, "sms": sms},
+                        "enabled": True,
+                        "created_at": datetime.now(),
+                        "source": "local",
+                        "alert_description": None,
+                        "event_id": None,
+                    }
+                )
                 st.session_state["next_alert_id"] += 1
                 st.success("Alert created!")
 
@@ -189,11 +259,11 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
     with col_right:
         st.markdown("### Active Alerts")
 
-        active = [a for a in st.session_state["alerts"] if a.get("enabled", True)]
+        active = [a for a in all_alerts if a.get("enabled", True)]
         if not active:
             st.info("No active alerts yet.")
 
-        for a in list(st.session_state["alerts"]):
+        for a in list(all_alerts):
             if not a.get("enabled", True):
                 continue
 
@@ -205,19 +275,38 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
                 st.write(f"{a['category']} • {a['alert_type']}")
                 st.write(f"Next trigger: {trigger_str}")
 
+                if a.get("alert_description"):
+                    st.write(f"Description: {a['alert_description']}")
+
+                if a.get("event_id") is not None:
+                    st.write(f"Event ID: {a['event_id']}")
+
                 c1, c2, c3 = st.columns(3)
+                is_database_alert = str(a["id"]).startswith("db_")
+
                 with c1:
-                    if st.button("Edit", key=f"edit_{a['id']}"):
-                        st.session_state["editing_alert_id"] = a["id"]
-                        st.rerun()
+                    if is_database_alert:
+                        st.button("Edit", key=f"edit_{a['id']}", disabled=True)
+                    else:
+                        if st.button("Edit", key=f"edit_{a['id']}"):
+                            st.session_state["editing_alert_id"] = a["id"]
+                            st.rerun()
+
                 with c2:
-                    if st.button("Disable", key=f"disable_{a['id']}"):
-                        a["enabled"] = False
-                        st.rerun()
+                    if is_database_alert:
+                        st.button("Disable", key=f"disable_{a['id']}", disabled=True)
+                    else:
+                        if st.button("Disable", key=f"disable_{a['id']}"):
+                            a["enabled"] = False
+                            st.rerun()
+
                 with c3:
-                    if st.button("Delete", key=f"delete_{a['id']}"):
-                        st.session_state["alerts"].remove(a)
-                        st.rerun()
+                    if is_database_alert:
+                        st.button("Delete", key=f"delete_{a['id']}", disabled=True)
+                    else:
+                        if st.button("Delete", key=f"delete_{a['id']}"):
+                            st.session_state["alerts"].remove(a)
+                            st.rerun()
 
         # =======================
         # Edit Alert
@@ -267,7 +356,7 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
             rows.append({"Time": tt.strftime("%I:%M %p"), "Alert": a["title"], "Source": source})
 
         if rows:
-            st.dataframe(rows, hide_index=True, use_container_width=True)
+            st.dataframe(rows, hide_index=True, width="stretch")
         else:
             st.write("No upcoming alerts match your filters.")
 
