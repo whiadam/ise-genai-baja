@@ -50,7 +50,7 @@ def display_app_page():
 
     # ✅ GenAI button
     if st.button("Generate AI Summary"):
-        summary = get_genai_data(userId)
+        summary = get_genai_data('user1')
         st.write(summary["content"])
 
 
