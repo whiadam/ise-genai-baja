@@ -4,7 +4,7 @@ from datetime import datetime, date, time, timedelta
 from typing import Any
 
 import streamlit as st
-from alerts_fetcher import get_all_alerts
+from .alerts_fetcher import get_all_alerts
 
 ##################### Danae's Section ############################
 def _ensure_alert_state() -> None:
