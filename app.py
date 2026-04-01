@@ -17,41 +17,44 @@ def register_pages():
         st.Page(display_app_page, title="Home", default=True),
         st.Page(display_flyer_updater_page, title="Flyer Updater"),
         st.Page("campus_voice.py", title="Campus Voice"),
-        st.Page(display_alerts, title ="Alerts")
+        st.Page(display_alerts, title="Alerts"),
+        st.Page("campus_map.py", title="Campus Map"),
+        st.Page("event_module/view.py", title="Events"),
     ]
 
 
 def display_app_page():
     """Displays the home page of the app."""
     st.title("Campus Info App")
-
-    # ✅ FIXED (no more profile error)
     st.caption("Logged in as student user")
-
     st.divider()
 
-    # ✅ Show some data from your database
     polls = get_active_polls()
     issues = get_issues()
 
-    st.subheader("Quick Poll Preview")
-    if polls:
-        for poll in polls[:3]:
-            st.write(f"- {poll['poll_question']}")
-    else:
-        st.write("No active polls right now.")
+    col1, col2 = st.columns(2)
 
-    st.subheader("Recent Issues Preview")
-    if issues:
-        for issue in issues[:3]:
-            st.write(f"- {issue['title']}")
-    else:
-        st.write("No recent issues right now.")
+    with col1:
+        st.subheader("Quick Poll Preview")
+        if polls:
+            for poll in polls[:3]:
+                st.write(f"- {poll['poll_question']}")
+        else:
+            st.info("No active polls right now.")
 
-    # ✅ GenAI button
+    with col2:
+        st.subheader("Recent Issues Preview")
+        if issues:
+            for issue in issues[:3]:
+                st.write(f"- {issue['title']}")
+        else:
+            st.info("No recent issues right now.")
+
+    st.divider()
     if st.button("Generate AI Summary"):
-        summary = get_genai_data('user1')
-        st.write(summary["content"])
+        with st.spinner("Generating summary..."):
+            summary = get_genai_data('user1')
+            st.write(summary["content"])
 
 
 if __name__ == '__main__':
