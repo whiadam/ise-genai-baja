@@ -1,17 +1,18 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-# Mock Google auth and BigQuery client before importing data_fetcher so tests
-# never hit real ADC or GCP services.
-with patch("google.auth.default") as mock_auth, patch("google.cloud.bigquery.Client"):
-    mock_auth.return_value = (MagicMock(), "test-project")
+# config.py constructs bigquery.Client() lazily inside get_client().
+# Patching config.get_client here (before data_fetcher is imported) prevents
+# any real BigQuery / ADC call from ever happening during tests.
+with patch("config.get_client", return_value=MagicMock()):
     import data_fetcher
 
 
 class TestDataFetcher(unittest.TestCase):
 
+    @patch("config.get_client", return_value=MagicMock())
     @patch("config.run_query")
-    def test_get_active_polls(self, mock_run_query):
+    def test_get_active_polls(self, mock_run_query, _mock_client):
         mock_row = MagicMock(
             PollId="poll1",
             PollQuestion="What food should the dining hall have more often?",
@@ -24,11 +25,12 @@ class TestDataFetcher(unittest.TestCase):
         result = data_fetcher.get_active_polls()
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result["poll_id"], "poll1")
-        self.assertTrue(result["is_active"])
+        self.assertEqual(result[0]["poll_id"], "poll1")
+        self.assertTrue(result[0]["is_active"])
 
+    @patch("config.get_client", return_value=MagicMock())
     @patch("config.run_query")
-    def test_get_issues(self, mock_run_query):
+    def test_get_issues(self, mock_run_query, _mock_client):
         mock_row = MagicMock(
             issue_id="issue1",
             Title="Dirty Bathroom",
@@ -41,12 +43,13 @@ class TestDataFetcher(unittest.TestCase):
         result = data_fetcher.get_issues()
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result["issue_id"], "issue1")
-        self.assertEqual(result["title"], "Dirty Bathroom")
-        self.assertEqual(result["rating"], 2)
+        self.assertEqual(result[0]["issue_id"], "issue1")
+        self.assertEqual(result[0]["title"], "Dirty Bathroom")
+        self.assertEqual(result[0]["rating"], 2)
 
+    @patch("config.get_client", return_value=MagicMock())
     @patch("config.run_query")
-    def test_get_filtered_issues(self, mock_run_query):
+    def test_get_filtered_issues(self, mock_run_query, _mock_client):
         mock_row = MagicMock(
             issue_id="issue2",
             Title="Broken Vending Machine",
@@ -59,11 +62,12 @@ class TestDataFetcher(unittest.TestCase):
         result = data_fetcher.get_filtered_issues(3)
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result["issue_id"], "issue2")
-        self.assertEqual(result["rating"], 3)
+        self.assertEqual(result[0]["issue_id"], "issue2")
+        self.assertEqual(result[0]["rating"], 3)
 
+    @patch("config.get_client", return_value=MagicMock())
     @patch("config.run_query")
-    def test_get_facility_ratings(self, mock_run_query):
+    def test_get_facility_ratings(self, mock_run_query, _mock_client):
         mock_row = MagicMock(
             RatingId="rating1",
             UserId="user1",
@@ -77,9 +81,10 @@ class TestDataFetcher(unittest.TestCase):
         result = data_fetcher.get_facility_ratings()
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result["facility_name"], "Library")
-        self.assertEqual(result["rating"], 5)
+        self.assertEqual(result[0]["facility_name"], "Library")
+        self.assertEqual(result[0]["rating"], 5)
 
+    @patch("config.get_client", return_value=MagicMock())
     @patch("data_fetcher._get_genai_model")
     @patch("data_fetcher.get_facility_ratings")
     @patch("data_fetcher.get_issues")
@@ -90,6 +95,7 @@ class TestDataFetcher(unittest.TestCase):
         mock_get_issues,
         mock_get_facility_ratings,
         mock_get_genai_model,
+        _mock_client,
     ):
         mock_get_active_polls.return_value = [{"poll_id": "poll1"}]
         mock_get_issues.return_value = [{"issue_id": "issue1"}]
@@ -107,11 +113,13 @@ class TestDataFetcher(unittest.TestCase):
         self.assertIn("content", result)
         self.assertTrue(len(result["content"]) > 0)
 
-    # ─────────────────────────────────────────────────────────────────────────
-    # Adams Added Tests:
-    # ─────────────────────────────────────────────────────────────────────────
+    # -------------------------------------------------------------------------
+    # Adams Added Tests
+    # -------------------------------------------------------------------------
+
+    @patch("config.get_client", return_value=MagicMock())
     @patch("config.run_query")
-    def test_get_user_profile(self, mock_run_query):
+    def test_get_user_profile(self, mock_run_query, _mock_client):
         mock_row = MagicMock()
         mock_row.full_name = "John Doe"
         mock_row.username = "johndoe"
@@ -119,19 +127,25 @@ class TestDataFetcher(unittest.TestCase):
         mock_row.profile_image = "profile.jpg"
         mock_row.friends = ["friend1", "friend2"]
         mock_run_query.return_value = [mock_row]
+
         result = data_fetcher.get_user_profile("user123")
+
         self.assertEqual(result["full_name"], "John Doe")
         self.assertEqual(result["username"], "johndoe")
         self.assertEqual(result["friends"], ["friend1", "friend2"])
 
+    @patch("config.get_client", return_value=MagicMock())
     @patch("config.run_query")
-    def test_get_user_profile_not_found(self, mock_run_query):
+    def test_get_user_profile_not_found(self, mock_run_query, _mock_client):
         mock_run_query.return_value = []
+
         result = data_fetcher.get_user_profile("nonexistent")
+
         self.assertIsNone(result)
 
+    @patch("config.get_client", return_value=MagicMock())
     @patch("config.run_query")
-    def test_get_user_posts(self, mock_run_query):
+    def test_get_user_posts(self, mock_run_query, _mock_client):
         mock_row = MagicMock()
         mock_row.user_id = "user123"
         mock_row.post_id = "post1"
@@ -139,30 +153,41 @@ class TestDataFetcher(unittest.TestCase):
         mock_row.content = "Event at library!"
         mock_row.image = None
         mock_run_query.return_value = [mock_row]
-        result = data_fetcher.get_user_posts("user123")
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result["post_id"], "post1")
-        self.assertIsNone(result["image"])
 
+        result = data_fetcher.get_user_posts("user123")
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["post_id"], "post1")
+        self.assertIsNone(result[0]["image"])
+
+    @patch("config.get_client", return_value=MagicMock())
     @patch("data_fetcher._get_genai_model")
     @patch("data_fetcher.get_user_profile")
-    def test_get_genai_advice(self, mock_profile, mock_model):
+    def test_get_genai_advice(self, mock_profile, mock_model, _mock_client):
         mock_profile.return_value = {
-            "full_name": "John Doe", "username": "johndoe",
-            "date_of_birth": "2000-01-01", "profile_image": None, "friends": []
+            "full_name": "John Doe",
+            "username": "johndoe",
+            "date_of_birth": "2000-01-01",
+            "profile_image": None,
+            "friends": [],
         }
         mock_response = MagicMock()
         mock_response.text = "Check out the events on campus this week!"
         mock_model.return_value.generate_content.return_value = mock_response
+
         result = data_fetcher.get_genai_advice("user123")
+
         self.assertEqual(result["advice_id"], "genai-advice-1")
         self.assertIsNone(result["image"])
         self.assertIn("content", result)
 
+    @patch("config.get_client", return_value=MagicMock())
     @patch("data_fetcher.get_user_profile")
-    def test_get_genai_advice_no_profile(self, mock_profile):
+    def test_get_genai_advice_no_profile(self, mock_profile, _mock_client):
         mock_profile.return_value = None
+
         result = data_fetcher.get_genai_advice("ghost_user")
+
         self.assertIsNone(result["image"])
         self.assertTrue(len(result["content"]) > 0)
 
