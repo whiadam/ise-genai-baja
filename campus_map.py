@@ -13,24 +13,24 @@ from streamlit_folium import st_folium
 from folium.plugins import MarkerCluster
 
 # ---------------------------------------------------------------------------
-# CSUF campus center  (33.8823° N, 117.8851° W)
+# Duke University campus center  (~36.0015° N, 78.9391° W)
 # ---------------------------------------------------------------------------
-CAMPUS_CENTER = [33.8823, -117.8851]
+CAMPUS_CENTER = [36.001465, -78.939133]
 
 # ---------------------------------------------------------------------------
-# Building data — replace / extend with a BigQuery fetch when ready
+# Building data — Duke University West Campus landmarks
 # ---------------------------------------------------------------------------
 BUILDINGS = [
-    {"id": 1,  "name": "Pollak Library",            "lat": 33.8824, "lon": -117.8849, "type": "study"},
-    {"id": 2,  "name": "Titan Student Union",        "lat": 33.8830, "lon": -117.8862, "type": "dining"},
-    {"id": 3,  "name": "Student Recreation Center", "lat": 33.8817, "lon": -117.8878, "type": "recreation"},
-    {"id": 4,  "name": "CS & Engineering Building", "lat": 33.8820, "lon": -117.8835, "type": "academic"},
-    {"id": 5,  "name": "McCarthy Hall",              "lat": 33.8810, "lon": -117.8851, "type": "academic"},
-    {"id": 6,  "name": "University Hall",            "lat": 33.8832, "lon": -117.8844, "type": "admin"},
-    {"id": 7,  "name": "Nutwood Parking Structure", "lat": 33.8798, "lon": -117.8855, "type": "parking"},
-    {"id": 8,  "name": "Titan Gymnasium",            "lat": 33.8840, "lon": -117.8870, "type": "recreation"},
-    {"id": 9,  "name": "Visual Arts Building",       "lat": 33.8806, "lon": -117.8838, "type": "academic"},
-    {"id": 10, "name": "Langsdorf Hall",             "lat": 33.8837, "lon": -117.8853, "type": "admin"},
+    {"id": 1,  "name": "Perkins & Bostock Libraries", "lat": 36.0019, "lon": -78.9388, "type": "study"},
+    {"id": 2,  "name": "Bryan Center",                "lat": 36.0009, "lon": -78.9410, "type": "dining"},
+    {"id": 3,  "name": "Wilson Recreation Center",    "lat": 36.0005, "lon": -78.9440, "type": "recreation"},
+    {"id": 4,  "name": "Fitzpatrick Center (CIEMAS)", "lat": 36.0017, "lon": -78.9430, "type": "academic"},
+    {"id": 5,  "name": "Duke Chapel",                 "lat": 36.0007, "lon": -78.9389, "type": "academic"},
+    {"id": 6,  "name": "Allen Building",              "lat": 36.0004, "lon": -78.9376, "type": "admin"},
+    {"id": 7,  "name": "Bryan Center Parking Garage", "lat": 36.0006, "lon": -78.9420, "type": "parking"},
+    {"id": 8,  "name": "Cameron Indoor Stadium",      "lat": 35.9979, "lon": -78.9420, "type": "recreation"},
+    {"id": 9,  "name": "Nasher Museum of Art",        "lat": 36.0033, "lon": -78.9406, "type": "academic"},
+    {"id": 10, "name": "Sarah P. Duke Gardens",        "lat": 36.0001, "lon": -78.9400, "type": "recreation"},
 ]
 
 TYPE_COLORS = {
@@ -43,7 +43,7 @@ TYPE_COLORS = {
 }
 
 st.title("🗺️ Campus Map")
-st.markdown("Browse CSUF buildings. Use the sidebar to filter by type or jump to a specific building.")
+st.markdown("Browse Duke University buildings. Use the sidebar to filter by type or jump to a specific building.")
 
 # ---------------------------------------------------------------------------
 # Sidebar controls

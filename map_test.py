@@ -11,7 +11,7 @@ def test_app_renders_title_and_sidebar():
 
 def test_building_selection_message():
     at = AppTest.from_file("campus_map.py").run()
-    at.sidebar.selectbox[0].select("Pollak Library")
+    at.sidebar.selectbox[0].select("Perkins & Bostock Libraries")
     at = at.run()
-    assert "Pollak Library" in at.success[0].value
+    assert "Perkins & Bostock Libraries" in at.success[0].value
     assert "study" in at.success[0].value.lower()
