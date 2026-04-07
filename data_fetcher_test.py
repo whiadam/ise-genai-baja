@@ -1,8 +1,12 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-with patch("google.cloud.bigquery.Client"):
+# Mock Google auth and BigQuery client before importing data_fetcher so tests
+# never hit real ADC or GCP services.
+with patch("google.auth.default") as mock_auth, patch("google.cloud.bigquery.Client"):
+    mock_auth.return_value = (MagicMock(), "test-project")
     import data_fetcher
+
 
 class TestDataFetcher(unittest.TestCase):
 
@@ -20,8 +24,8 @@ class TestDataFetcher(unittest.TestCase):
         result = data_fetcher.get_active_polls()
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["poll_id"], "poll1")
-        self.assertTrue(result[0]["is_active"])
+        self.assertEqual(result["poll_id"], "poll1")
+        self.assertTrue(result["is_active"])
 
     @patch("config.run_query")
     def test_get_issues(self, mock_run_query):
@@ -37,9 +41,9 @@ class TestDataFetcher(unittest.TestCase):
         result = data_fetcher.get_issues()
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["issue_id"], "issue1")
-        self.assertEqual(result[0]["title"], "Dirty Bathroom")
-        self.assertEqual(result[0]["rating"], 2)
+        self.assertEqual(result["issue_id"], "issue1")
+        self.assertEqual(result["title"], "Dirty Bathroom")
+        self.assertEqual(result["rating"], 2)
 
     @patch("config.run_query")
     def test_get_filtered_issues(self, mock_run_query):
@@ -55,8 +59,8 @@ class TestDataFetcher(unittest.TestCase):
         result = data_fetcher.get_filtered_issues(3)
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["issue_id"], "issue2")
-        self.assertEqual(result[0]["rating"], 3)
+        self.assertEqual(result["issue_id"], "issue2")
+        self.assertEqual(result["rating"], 3)
 
     @patch("config.run_query")
     def test_get_facility_ratings(self, mock_run_query):
@@ -73,8 +77,8 @@ class TestDataFetcher(unittest.TestCase):
         result = data_fetcher.get_facility_ratings()
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["facility_name"], "Library")
-        self.assertEqual(result[0]["rating"], 5)
+        self.assertEqual(result["facility_name"], "Library")
+        self.assertEqual(result["rating"], 5)
 
     @patch("data_fetcher._get_genai_model")
     @patch("data_fetcher.get_facility_ratings")
@@ -103,9 +107,9 @@ class TestDataFetcher(unittest.TestCase):
         self.assertIn("content", result)
         self.assertTrue(len(result["content"]) > 0)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Adams Added Tests:
-# ─────────────────────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────────────────────────────────
+    # Adams Added Tests:
+    # ─────────────────────────────────────────────────────────────────────────
     @patch("config.run_query")
     def test_get_user_profile(self, mock_run_query):
         mock_row = MagicMock()
@@ -137,8 +141,8 @@ class TestDataFetcher(unittest.TestCase):
         mock_run_query.return_value = [mock_row]
         result = data_fetcher.get_user_posts("user123")
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["post_id"], "post1")
-        self.assertIsNone(result[0]["image"])
+        self.assertEqual(result["post_id"], "post1")
+        self.assertIsNone(result["image"])
 
     @patch("data_fetcher._get_genai_model")
     @patch("data_fetcher.get_user_profile")
@@ -161,6 +165,7 @@ class TestDataFetcher(unittest.TestCase):
         result = data_fetcher.get_genai_advice("ghost_user")
         self.assertIsNone(result["image"])
         self.assertTrue(len(result["content"]) > 0)
+
 
 if __name__ == "__main__":
     unittest.main()
