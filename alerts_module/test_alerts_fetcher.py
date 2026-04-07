@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-import alerts_fetcher
+from alerts_module import alerts_fetcher
 
 ################### Danae's Tests #########################
 class TestAlertDataFetcher(unittest.TestCase):
