@@ -6,20 +6,12 @@ from alerts_module import alerts_fetcher
 
 ################### Danae's Tests #########################
 class TestAlertDataFetcher(unittest.TestCase):
-    """
-    Test suite for alert-related BigQuery and GenAI data fetcher functions.
-    """
+    """Test suite for alert-related BigQuery and GenAI data fetcher functions."""
 
-    @patch("alerts_module.alerts_fetcher.get_bigquery_client")
-    def test_get_all_alerts_returns_all_rows(self, mock_get_bigquery_client):
-        """
-        All lines in this function written by GPT-5.2 Thinking
-
-        Verifies get_all_alerts returns all rows from the database as dictionaries.
-        """
-        mock_client = MagicMock()
-        mock_query_job = MagicMock()
-        mock_query_job.result.return_value = [
+    @patch("alerts_module.alerts_fetcher.run_query")
+    def test_get_all_alerts_returns_all_rows(self, mock_run_query):
+        """Verifies get_all_alerts returns all rows from the database as dictionaries."""
+        mock_run_query.return_value = [
             {
                 "alert_id": 1,
                 "preference": ["Email", "Text"],
@@ -30,82 +22,57 @@ class TestAlertDataFetcher(unittest.TestCase):
                 "event_id": 101,
             }
         ]
-        mock_client.query.return_value = mock_query_job
-        mock_get_bigquery_client.return_value = mock_client
 
         result = alerts_fetcher.get_all_alerts()
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["alert_id"], 1)
-        mock_client.query.assert_called_once()
+        mock_run_query.assert_called_once()
 
-    @patch("alerts_module.alerts_fetcher.get_bigquery_client")
-    def test_get_alert_by_id_returns_matching_alert(self, mock_get_bigquery_client):
-        """
-        All lines in this function written by GPT-5.2 Thinking
-        """
-        mock_client = MagicMock()
-        mock_query_job = MagicMock()
-        mock_query_job.result.return_value = [
+    @patch("alerts_module.alerts_fetcher.run_query")
+    def test_get_alert_by_id_returns_matching_alert(self, mock_run_query):
+        mock_run_query.return_value = [
             {"alert_id": 5, "alert_name": "Advisor Meeting"}
         ]
-        mock_client.query.return_value = mock_query_job
-        mock_get_bigquery_client.return_value = mock_client
 
         result = alerts_fetcher.get_alert_by_id(5)
 
         self.assertIsNotNone(result)
         self.assertEqual(result["alert_id"], 5)
+        mock_run_query.assert_called_once()
 
-    @patch("alerts_module.alerts_fetcher.get_bigquery_client")
-    def test_get_alert_by_id_returns_none(self, mock_get_bigquery_client):
-        """
-        All lines in this function written by GPT-5.2 Thinking
-        """
-        mock_client = MagicMock()
-        mock_query_job = MagicMock()
-        mock_query_job.result.return_value = []
-        mock_client.query.return_value = mock_query_job
-        mock_get_bigquery_client.return_value = mock_client
+    @patch("alerts_module.alerts_fetcher.run_query")
+    def test_get_alert_by_id_returns_none(self, mock_run_query):
+        mock_run_query.return_value = []
 
         result = alerts_fetcher.get_alert_by_id(999)
 
         self.assertIsNone(result)
+        mock_run_query.assert_called_once()
 
-    @patch("alerts_module.alerts_fetcher.get_bigquery_client")
-    def test_get_alerts_by_preference(self, mock_get_bigquery_client):
-        """
-        All lines in this function written by GPT-5.2 Thinking
-        """
-        mock_client = MagicMock()
-        mock_query_job = MagicMock()
-        mock_query_job.result.return_value = [
+    @patch("alerts_module.alerts_fetcher.run_query")
+    def test_get_alerts_by_preference(self, mock_run_query):
+        mock_run_query.return_value = [
             {"alert_id": 7, "preference": ["Email", "Text"]}
         ]
-        mock_client.query.return_value = mock_query_job
-        mock_get_bigquery_client.return_value = mock_client
 
         result = alerts_fetcher.get_alerts_by_preference("Email")
 
         self.assertEqual(len(result), 1)
         self.assertIn("Email", result[0]["preference"])
+        mock_run_query.assert_called_once()
 
-    @patch("alerts_module.alerts_fetcher.get_bigquery_client")
-    def test_get_recurring_alerts(self, mock_get_bigquery_client):
-        """
-        All lines in this function written by GPT-5.2 Thinking
-        """
-        mock_client = MagicMock()
-        mock_query_job = MagicMock()
-        mock_query_job.result.return_value = [
-            {"alert_id": 11, "reoccuring": True}
+    @patch("alerts_module.alerts_fetcher.run_query")
+    def test_get_recurring_alerts(self, mock_run_query):
+        mock_run_query.return_value = [
+            {"alert_id": 11, "reoccuring": True},
+            {"alert_id": 12, "reoccuring": True},
         ]
-        mock_client.query.return_value = mock_query_job
-        mock_get_bigquery_client.return_value = mock_client
 
         result = alerts_fetcher.get_recurring_alerts()
 
         self.assertTrue(all(a["reoccuring"] for a in result))
+        mock_run_query.assert_called_once()
 
     @patch("alerts_module.alerts_fetcher.GenerativeModel")
     @patch("alerts_module.alerts_fetcher.vertexai.init")
@@ -116,9 +83,6 @@ class TestAlertDataFetcher(unittest.TestCase):
         mock_vertexai_init,
         mock_generative_model,
     ):
-        """
-        All lines in this function written by GPT-5.2 Thinking
-        """
         mock_get_all_alerts.return_value = [
             {
                 "alert_name": "Test Alert",
