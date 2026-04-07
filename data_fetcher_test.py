@@ -6,8 +6,8 @@ with patch("google.cloud.bigquery.Client"):
 
 class TestDataFetcher(unittest.TestCase):
 
-    @patch("data_fetcher.client")
-    def test_get_active_polls(self, mock_client):
+    @patch("config.run_query")
+    def test_get_active_polls(self, mock_run_query):
         mock_row = MagicMock(
             PollId="poll1",
             PollQuestion="What food should the dining hall have more often?",
@@ -15,7 +15,7 @@ class TestDataFetcher(unittest.TestCase):
             Category="Food",
             IsActive=True,
         )
-        mock_client.query.return_value.result.return_value = [mock_row]
+        mock_run_query.return_value = [mock_row]
 
         result = data_fetcher.get_active_polls()
 
@@ -23,8 +23,8 @@ class TestDataFetcher(unittest.TestCase):
         self.assertEqual(result[0]["poll_id"], "poll1")
         self.assertTrue(result[0]["is_active"])
 
-    @patch("data_fetcher.client")
-    def test_get_issues(self, mock_client):
+    @patch("config.run_query")
+    def test_get_issues(self, mock_run_query):
         mock_row = MagicMock(
             issue_id="issue1",
             Title="Dirty Bathroom",
@@ -32,7 +32,7 @@ class TestDataFetcher(unittest.TestCase):
             Time_stamp="2026-03-23 10:00:00",
             Rating=2,
         )
-        mock_client.query.return_value.result.return_value = [mock_row]
+        mock_run_query.return_value = [mock_row]
 
         result = data_fetcher.get_issues()
 
@@ -41,8 +41,8 @@ class TestDataFetcher(unittest.TestCase):
         self.assertEqual(result[0]["title"], "Dirty Bathroom")
         self.assertEqual(result[0]["rating"], 2)
 
-    @patch("data_fetcher.client")
-    def test_get_filtered_issues(self, mock_client):
+    @patch("config.run_query")
+    def test_get_filtered_issues(self, mock_run_query):
         mock_row = MagicMock(
             issue_id="issue2",
             Title="Broken Vending Machine",
@@ -50,7 +50,7 @@ class TestDataFetcher(unittest.TestCase):
             Time_stamp="2026-03-23 11:00:00",
             Rating=3,
         )
-        mock_client.query.return_value.result.return_value = [mock_row]
+        mock_run_query.return_value = [mock_row]
 
         result = data_fetcher.get_filtered_issues(3)
 
@@ -58,8 +58,8 @@ class TestDataFetcher(unittest.TestCase):
         self.assertEqual(result[0]["issue_id"], "issue2")
         self.assertEqual(result[0]["rating"], 3)
 
-    @patch("data_fetcher.client")
-    def test_get_facility_ratings(self, mock_client):
+    @patch("config.run_query")
+    def test_get_facility_ratings(self, mock_run_query):
         mock_row = MagicMock(
             RatingId="rating1",
             UserId="user1",
@@ -68,7 +68,7 @@ class TestDataFetcher(unittest.TestCase):
             Comment="Very clean",
             CreatedAt="2026-03-23 11:00:00",
         )
-        mock_client.query.return_value.result.return_value = [mock_row]
+        mock_run_query.return_value = [mock_row]
 
         result = data_fetcher.get_facility_ratings()
 
@@ -106,35 +106,35 @@ class TestDataFetcher(unittest.TestCase):
 # ─────────────────────────────────────────────────────────────────────────────
 # Adams Added Tests:
 # ─────────────────────────────────────────────────────────────────────────────
-    @patch("data_fetcher.client")
-    def test_get_user_profile(self, mock_client):
+    @patch("config.run_query")
+    def test_get_user_profile(self, mock_run_query):
         mock_row = MagicMock()
         mock_row.full_name = "John Doe"
         mock_row.username = "johndoe"
         mock_row.date_of_birth = "2000-01-01"
         mock_row.profile_image = "profile.jpg"
         mock_row.friends = ["friend1", "friend2"]
-        mock_client.query.return_value.result.return_value = [mock_row]
+        mock_run_query.return_value = [mock_row]
         result = data_fetcher.get_user_profile("user123")
         self.assertEqual(result["full_name"], "John Doe")
         self.assertEqual(result["username"], "johndoe")
         self.assertEqual(result["friends"], ["friend1", "friend2"])
 
-    @patch("data_fetcher.client")
-    def test_get_user_profile_not_found(self, mock_client):
-        mock_client.query.return_value.result.return_value = []
+    @patch("config.run_query")
+    def test_get_user_profile_not_found(self, mock_run_query):
+        mock_run_query.return_value = []
         result = data_fetcher.get_user_profile("nonexistent")
         self.assertIsNone(result)
 
-    @patch("data_fetcher.client")
-    def test_get_user_posts(self, mock_client):
+    @patch("config.run_query")
+    def test_get_user_posts(self, mock_run_query):
         mock_row = MagicMock()
         mock_row.user_id = "user123"
         mock_row.post_id = "post1"
         mock_row.timestamp = "2026-03-29 10:00:00"
         mock_row.content = "Event at library!"
         mock_row.image = None
-        mock_client.query.return_value.result.return_value = [mock_row]
+        mock_run_query.return_value = [mock_row]
         result = data_fetcher.get_user_posts("user123")
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["post_id"], "post1")
