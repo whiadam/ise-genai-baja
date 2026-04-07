@@ -1,17 +1,20 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-# config.py constructs bigquery.Client() lazily inside get_client().
-# Patching config.get_client here (before data_fetcher is imported) prevents
-# any real BigQuery / ADC call from ever happening during tests.
+# config.get_client() is the only place bigquery.Client() is constructed.
+# Patching it here prevents any ADC lookup when data_fetcher is imported.
 with patch("config.get_client", return_value=MagicMock()):
     import data_fetcher
 
 
 class TestDataFetcher(unittest.TestCase):
 
+    # data_fetcher.py does `from config import run_query`, so it holds its
+    # own reference. We must patch 'data_fetcher.run_query', not
+    # 'config.run_query', for the mock to intercept calls inside the module.
+
     @patch("config.get_client", return_value=MagicMock())
-    @patch("config.run_query")
+    @patch("data_fetcher.run_query")
     def test_get_active_polls(self, mock_run_query, _mock_client):
         mock_row = MagicMock(
             PollId="poll1",
@@ -29,7 +32,7 @@ class TestDataFetcher(unittest.TestCase):
         self.assertTrue(result[0]["is_active"])
 
     @patch("config.get_client", return_value=MagicMock())
-    @patch("config.run_query")
+    @patch("data_fetcher.run_query")
     def test_get_issues(self, mock_run_query, _mock_client):
         mock_row = MagicMock(
             issue_id="issue1",
@@ -48,7 +51,7 @@ class TestDataFetcher(unittest.TestCase):
         self.assertEqual(result[0]["rating"], 2)
 
     @patch("config.get_client", return_value=MagicMock())
-    @patch("config.run_query")
+    @patch("data_fetcher.run_query")
     def test_get_filtered_issues(self, mock_run_query, _mock_client):
         mock_row = MagicMock(
             issue_id="issue2",
@@ -66,7 +69,7 @@ class TestDataFetcher(unittest.TestCase):
         self.assertEqual(result[0]["rating"], 3)
 
     @patch("config.get_client", return_value=MagicMock())
-    @patch("config.run_query")
+    @patch("data_fetcher.run_query")
     def test_get_facility_ratings(self, mock_run_query, _mock_client):
         mock_row = MagicMock(
             RatingId="rating1",
@@ -118,7 +121,7 @@ class TestDataFetcher(unittest.TestCase):
     # -------------------------------------------------------------------------
 
     @patch("config.get_client", return_value=MagicMock())
-    @patch("config.run_query")
+    @patch("data_fetcher.run_query")
     def test_get_user_profile(self, mock_run_query, _mock_client):
         mock_row = MagicMock()
         mock_row.full_name = "John Doe"
@@ -135,7 +138,7 @@ class TestDataFetcher(unittest.TestCase):
         self.assertEqual(result["friends"], ["friend1", "friend2"])
 
     @patch("config.get_client", return_value=MagicMock())
-    @patch("config.run_query")
+    @patch("data_fetcher.run_query")
     def test_get_user_profile_not_found(self, mock_run_query, _mock_client):
         mock_run_query.return_value = []
 
@@ -144,7 +147,7 @@ class TestDataFetcher(unittest.TestCase):
         self.assertIsNone(result)
 
     @patch("config.get_client", return_value=MagicMock())
-    @patch("config.run_query")
+    @patch("data_fetcher.run_query")
     def test_get_user_posts(self, mock_run_query, _mock_client):
         mock_row = MagicMock()
         mock_row.user_id = "user123"
