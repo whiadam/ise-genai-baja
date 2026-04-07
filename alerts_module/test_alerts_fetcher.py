@@ -10,7 +10,7 @@ class TestAlertDataFetcher(unittest.TestCase):
     Test suite for alert-related BigQuery and GenAI data fetcher functions.
     """
 
-    @patch("alerts_fetcher.get_bigquery_client")
+    @patch("alerts_module.alerts_fetcher.get_bigquery_client")
     def test_get_all_alerts_returns_all_rows(self, mock_get_bigquery_client):
         """
         All lines in this function written by GPT-5.2 Thinking
@@ -39,7 +39,7 @@ class TestAlertDataFetcher(unittest.TestCase):
         self.assertEqual(result[0]["alert_id"], 1)
         mock_client.query.assert_called_once()
 
-    @patch("alerts_fetcher.get_bigquery_client")
+    @patch("alerts_module.alerts_fetcher.get_bigquery_client")
     def test_get_alert_by_id_returns_matching_alert(self, mock_get_bigquery_client):
         """
         All lines in this function written by GPT-5.2 Thinking
@@ -57,7 +57,7 @@ class TestAlertDataFetcher(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(result["alert_id"], 5)
 
-    @patch("alerts_fetcher.get_bigquery_client")
+    @patch("alerts_module.alerts_fetcher.get_bigquery_client")
     def test_get_alert_by_id_returns_none(self, mock_get_bigquery_client):
         """
         All lines in this function written by GPT-5.2 Thinking
@@ -72,7 +72,7 @@ class TestAlertDataFetcher(unittest.TestCase):
 
         self.assertIsNone(result)
 
-    @patch("alerts_fetcher.get_bigquery_client")
+    @patch("alerts_module.alerts_fetcher.get_bigquery_client")
     def test_get_alerts_by_preference(self, mock_get_bigquery_client):
         """
         All lines in this function written by GPT-5.2 Thinking
@@ -90,7 +90,7 @@ class TestAlertDataFetcher(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertIn("Email", result[0]["preference"])
 
-    @patch("alerts_fetcher.get_bigquery_client")
+    @patch("alerts_module.alerts_fetcher.get_bigquery_client")
     def test_get_recurring_alerts(self, mock_get_bigquery_client):
         """
         All lines in this function written by GPT-5.2 Thinking
@@ -107,9 +107,9 @@ class TestAlertDataFetcher(unittest.TestCase):
 
         self.assertTrue(all(a["reoccuring"] for a in result))
 
-    @patch("alerts_fetcher.GenerativeModel")
-    @patch("alerts_fetcher.vertexai.init")
-    @patch("alerts_fetcher.get_all_alerts")
+    @patch("alerts_module.alerts_fetcher.GenerativeModel")
+    @patch("alerts_module.alerts_fetcher.vertexai.init")
+    @patch("alerts_module.alerts_fetcher.get_all_alerts")
     def test_get_genai_alert_summary(
         self,
         mock_get_all_alerts,

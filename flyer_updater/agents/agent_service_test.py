@@ -8,8 +8,11 @@ with patch("google.cloud.bigquery.Client"):
 
 class TestAgentService(unittest.TestCase):
 
-    @patch("flyer_updater.agents.agent_service.runner")
-    def test_query_agent_text_only(self, mock_runner):
+    @patch("flyer_updater.agents.agent._get_runner_and_session")
+    def test_query_agent_text_only(self, mock_get_runner_and_session):
+        mock_runner = MagicMock()
+        mock_get_runner_and_session.return_value = (mock_runner, MagicMock())
+
         mock_event = MagicMock()
         mock_event.is_final_response.return_value = True
         mock_event.content.parts = [MagicMock(text="Extracted event data")]
@@ -22,8 +25,11 @@ class TestAgentService(unittest.TestCase):
         result = str(agent_service.query_agent("user1", "session1", "extract this"))
         self.assertIn("Extracted", result)
 
-    @patch("flyer_updater.agents.agent_service.runner")
-    def test_query_agent_empty_response(self, mock_runner):
+    @patch("flyer_updater.agents.agent._get_runner_and_session")
+    def test_query_agent_empty_response(self, mock_get_runner_and_session):
+        mock_runner = MagicMock()
+        mock_get_runner_and_session.return_value = (mock_runner, MagicMock())
+
         mock_event = MagicMock()
         mock_event.is_final_response.return_value = False
         mock_event.content = None
@@ -36,8 +42,11 @@ class TestAgentService(unittest.TestCase):
         result = agent_service.query_agent("user1", "session1", "hello")
         self.assertEqual(result, "")
 
-    @patch("flyer_updater.agents.agent_service.runner")
-    def test_query_agent_with_image(self, mock_runner):
+    @patch("flyer_updater.agents.agent._get_runner_and_session")
+    def test_query_agent_with_image(self, mock_get_runner_and_session):
+        mock_runner = MagicMock()
+        mock_get_runner_and_session.return_value = (mock_runner, MagicMock())
+
         mock_event = MagicMock()
         mock_event.is_final_response.return_value = True
         mock_event.content.parts = [MagicMock(text="Found: Spring Concert")]
@@ -54,8 +63,11 @@ class TestAgentService(unittest.TestCase):
         result = str(agent_service.query_agent("user1", "session1", "extract this", image=mock_image))
         self.assertIn("Spring Concert", result)
 
-    @patch("flyer_updater.agents.agent_service.runner")
-    def test_query_agent_with_audio(self, mock_runner):
+    @patch("flyer_updater.agents.agent._get_runner_and_session")
+    def test_query_agent_with_audio(self, mock_get_runner_and_session):
+        mock_runner = MagicMock()
+        mock_get_runner_and_session.return_value = (mock_runner, MagicMock())
+
         mock_event = MagicMock()
         mock_event.is_final_response.return_value = True
         mock_event.content.parts = [MagicMock(text="Department is CS")]
@@ -72,11 +84,13 @@ class TestAgentService(unittest.TestCase):
         result = str(agent_service.query_agent("user1", "session1", "listen to this", audio=mock_audio))
         self.assertIn("CS", result)
 
-    @patch("flyer_updater.agents.agent_service.session_service")
-    def test_get_or_create_session_new(self, mock_session_service):
+    @patch("flyer_updater.agents.agent._get_runner_and_session")
+    def test_get_or_create_session_new(self, mock_get_runner_and_session):
+        mock_session_service = MagicMock()
         mock_session = MagicMock()
         mock_session.id = "new-session-123"
         mock_session_service.create_session = AsyncMock(return_value=mock_session)
+        mock_get_runner_and_session.return_value = (MagicMock(), mock_session_service)
 
         result = agent_service.get_or_create_session("user1")
         self.assertEqual(result, "new-session-123")
