@@ -12,7 +12,6 @@ with patch("google.cloud.bigquery.Client"):
 
 
 class TestFlyerUpdater(unittest.TestCase):
-
     def setUp(self):
         self.at = AppTest.from_function(self._render_page)
         self.at.run()
@@ -25,15 +24,36 @@ class TestFlyerUpdater(unittest.TestCase):
     def test_page_renders(self):
         self.assertFalse(self.at.exception)
 
-    def test_title_displayed(self):
-        self.assertEqual(self.at.title[0].value, "Flyer Updater")
+    def test_header_displayed(self):
+        self.assertEqual(self.at.header[0].value, "Event Creation Assistant")
 
-    def test_radio_exists(self):
-        self.assertTrue(len(self.at.radio) > 0)
+    def test_radio_has_three_tabs(self):
+        radio = self.at.radio[0]
+        self.assertEqual(len(radio.options), 3)
+        self.assertIn("Chat", radio.options)
+        self.assertIn("Camera", radio.options)
+        self.assertIn("Upload", radio.options)
+
+    def test_default_tab_is_chat(self):
+        self.assertEqual(self.at.radio[0].value, "Chat")
 
     def test_chat_input_exists(self):
         self.assertTrue(len(self.at.chat_input) > 0)
 
+    def test_file_uploader_not_visible_on_chat_tab(self):
+        self.assertEqual(len(self.at.file_uploader), 0)
+
+    def test_camera_tab_renders_without_exception(self):
+        self.at.radio[0].set_value("Camera").run()
+        self.assertFalse(self.at.exception)
+
+    def test_upload_tab_renders_without_exception(self):
+        self.at.radio[0].set_value("Upload").run()
+        self.assertFalse(self.at.exception)
+
+    def test_file_uploader_visible_on_upload_tab(self):
+        self.at.radio[0].set_value("Upload").run()
+        self.assertEqual(len(self.at.file_uploader), 1)
 
 ###########################################################
 ## Test Flyer Fetcher
