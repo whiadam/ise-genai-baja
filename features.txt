@@ -1,0 +1,6 @@
+Feature 1: Map View  
+This part lets users see where issues are happening around campus using a map. It makes it easier to find problems based on location instead of just reading a list.
+
+Feature 2: Trending Issues  
+This part shows the issues that are being reported the most by students. It helps users quickly see what problems are affecting the most people.
+These features were chosen to make the app easier to use and more helpful for students.
