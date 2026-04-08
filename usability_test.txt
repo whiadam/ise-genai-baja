@@ -1,0 +1,15 @@
+Intro: 
+I explained that this was a paper prototype of an app and asked the participants to act like they were using it.
+
+Tasks:  
+Task 1: Find where issues are happening on campus.  
+Task 2: Find the most reported issues.
+
+Notes:  
+Both participants were able to complete the tasks. One hesitated when using the map, and the other paused when looking at the trending list.
+
+Feedback:  
+They said the app was easy to use but suggested making it more clear what is clickable.
+
+Results: 
+Some parts of the app were not clearly interactive. To fix this, I would make buttons and clickable areas more obvious.
