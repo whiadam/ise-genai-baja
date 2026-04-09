@@ -1,15 +1,19 @@
-Intro: 
-I explained that this was a paper prototype of an app and asked the participants to act like they were using it.
+Intro  
+I explained that this was a paper prototype of an app and asked the participants to act like they were using a real app. I also asked them to think out loud while completing the tasks.
 
-Tasks:  
+Tasks  
 Task 1: Find where issues are happening on campus.  
-Task 2: Find the most reported issues.
+Task 2: Find the most reported issues on campus.
 
-Notes:  
-Both participants were able to complete the tasks. One hesitated when using the map, and the other paused when looking at the trending list.
+Notes  
+Participant 1 was able to complete both tasks but hesitated when using the map and was unsure if the pins were clickable.  
+Participant 2 completed both tasks but paused when looking at the trending list and was unsure if the items could be clicked.
 
-Feedback:  
-They said the app was easy to use but suggested making it more clear what is clickable.
+Feedback  
+Participant 1 said, “I didn’t know I could click the map pins at first.”  
+Participant 2 said, “I thought the trending list was just information, not something I could click.”
 
-Results: 
-Some parts of the app were not clearly interactive. To fix this, I would make buttons and clickable areas more obvious.
+Results  
+One issue was that users were unsure if the map pins were clickable. This may be because they were not clearly labeled. To fix this, I added a label saying “Tap pin to view details” and made the pins more noticeable.  
+
+Another issue was that users did not know the trending list was interactive. This may be because it's on paper or just plain text. To fix this, I added a label saying “Click to view details” and made each issue look more like a button.
