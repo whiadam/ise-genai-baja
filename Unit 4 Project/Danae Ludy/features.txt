@@ -1,0 +1,29 @@
+Feature 1: Active Alert Carousel
+Description:
+The current Alerts page displays active alerts in a long vertical list, which takes up a large amount of space and makes the page harder to scan. This feature will redesign the Active Alerts section into a horizontal carousel/tab-style interface that displays one alert card at a time. Users will be able to move left and right through alerts using arrow buttons or visual navigation indicators.
+
+Main user value:
+- Makes the page cleaner and easier to navigate
+- Reduces scrolling
+- Makes the app feel more polished and interactive
+
+Main interactions:
+- View one active alert card at a time
+- Move left/right through alerts
+- See alert position (example: 2 of 10)
+- Use Edit/Disable/Delete from the card
+
+Feature 2: GenAI Smart Alert Summary
+Description:
+The Alerts page currently shows detailed alert data, but users must manually read and interpret many alerts. This feature adds a GenAI-generated summary panel that explains the most important alert information in plain language. The summary will use current alert data from the database and identify urgent alerts, patterns, and reminders that matter most.
+
+Main user value:
+- Helps users quickly understand their alerts
+- Reduces information overload
+- Adds a smart and unique feature to the app
+
+Main interactions:
+- View an automatically generated alert summary
+- Refresh the summary
+- View brief or detailed summary modes
+- Highlight the most urgent or important alerts
