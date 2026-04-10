@@ -16,82 +16,94 @@ def _get_genai_model():
 
 
 def get_active_polls():
-    """Returns active polls from the database."""
+    """Returns active polls from the database, or fallback demo data."""
     query = f"""
         SELECT PollId, PollQuestion, CreatedAt, Category, IsActive
         FROM `{PROJECT_DATASET}.campus_voice_polls`
         WHERE IsActive = TRUE
         ORDER BY CreatedAt DESC
     """
+    rows = client.query(query).result()
+
     polls = []
-    for row in run_query(query):
+    for row in rows:
         polls.append({
-            "poll_id":       row.PollId,
+            "poll_id": row.PollId,
             "poll_question": row.PollQuestion,
-            "created_at":    row.CreatedAt,
-            "category":      row.Category,
-            "is_active":     row.IsActive,
+            "created_at": row.CreatedAt,
+            "category": row.Category,
+            "is_active": row.IsActive,
         })
     return polls
 
 
 def get_issues():
-    """Returns all campus issues from the database."""
+    """Returns all campus issues from the database, or fallback demo data."""
     query = f"""
         SELECT issue_id, Title, Description, Time_stamp, Rating
         FROM `{PROJECT_DATASET}.campus_voice_issues`
         ORDER BY Time_stamp DESC
     """
+    rows = client.query(query).result()
+
     issues = []
-    for row in run_query(query):
+    for row in rows:
         issues.append({
-            "issue_id":    row.issue_id,
-            "title":       row.Title,
+            "issue_id": row.issue_id,
+            "title": row.Title,
             "description": row.Description,
-            "timestamp":   row.Time_stamp,
-            "rating":      row.Rating,
+            "timestamp": row.Time_stamp,
+            "rating": row.Rating,
         })
     return issues
 
 
 def get_filtered_issues(min_rating):
-    """Returns issues with a rating >= the given value."""
-    from google.cloud import bigquery
+    """Returns issues with a rating greater than or equal to the given value."""
     query = f"""
         SELECT issue_id, Title, Description, Time_stamp, Rating
-        FROM `{PROJECT_DATASET}.campus_voice_issues`
+        FROM `{PROJECT_ID}.{DATASET}.campus_voice_issues`
         WHERE Rating >= @min_rating
         ORDER BY Time_stamp DESC
     """
-    params = [bigquery.ScalarQueryParameter("min_rating", "INT64", min_rating)]
+    job_config = bigquery.QueryJobConfig(
+        query_parameters=[
+            bigquery.ScalarQueryParameter("min_rating", "INT64", min_rating)
+        ]
+    )
+
+    rows = client.query(query, job_config=job_config).result()
+
     issues = []
-    for row in run_query(query, params=params):
+    for row in rows:
         issues.append({
-            "issue_id":    row.issue_id,
-            "title":       row.Title,
+            "issue_id": row.issue_id,
+            "title": row.Title,
             "description": row.Description,
-            "timestamp":   row.Time_stamp,
-            "rating":      row.Rating,
+            "timestamp": row.Time_stamp,
+            "rating": row.Rating,
         })
     return issues
 
 
 def get_facility_ratings():
-    """Returns facility ratings from the database."""
+    """Returns facility ratings from the database, or fallback demo data."""
     query = f"""
         SELECT RatingId, UserId, FacilityName, Rating, Comment, CreatedAt
         FROM `{PROJECT_DATASET}.campus_voice_facility_ratings`
         ORDER BY CreatedAt DESC
     """
+    rows = client.query(query).result()
+
     ratings = []
-    for row in run_query(query):
+    for row in rows:
         ratings.append({
-            "rating_id":     row.RatingId,
-            "user_id":       row.UserId,
+            "rating_id": row.RatingId,
+            "user_id": row.UserId,
             "facility_name": row.FacilityName,
-            "rating":        row.Rating,
-            "comment":       row.Comment,
-            "created_at":    row.CreatedAt,
+            "rating": row.Rating,
+            "comment": row.Comment,
+            "created_at": row.CreatedAt,
         })
     return ratings
 
@@ -133,85 +145,6 @@ def get_genai_data(user_id="user1"):
     return {
         "advice_id": "genai1",
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "content":   content,
-        "image":     None,
-    }
-
-
-# ---------------------------------------------------------------------------
-# Adams Lab Functions
-# ---------------------------------------------------------------------------
-
-def get_user_profile(user_id):
-    from google.cloud import bigquery
-    query = f"""
-        SELECT u.full_name, u.username, u.date_of_birth, u.profile_image,
-               ARRAY_AGG(f.friend_user_id IGNORE NULLS) AS friends
-        FROM `{PROJECT_DATASET}.users` u
-        LEFT JOIN `{PROJECT_DATASET}.friends` f ON u.user_id = f.user_id
-        WHERE u.user_id = @user_id
-        GROUP BY u.full_name, u.username, u.date_of_birth, u.profile_image
-    """
-    params = [bigquery.ScalarQueryParameter("user_id", "STRING", user_id)]
-    rows = list(run_query(query, params=params))
-    if not rows:
-        return None
-    row = rows[0]
-    return {
-        "full_name":     row.full_name,
-        "username":      row.username,
-        "date_of_birth": str(row.date_of_birth),
-        "profile_image": row.profile_image,
-        "friends":       list(row.friends) if row.friends else [],
-    }
-
-
-def get_user_posts(user_id):
-    from google.cloud import bigquery
-    query = f"""
-        SELECT user_id, post_id, timestamp, content, image
-        FROM `{PROJECT_DATASET}.posts`
-        WHERE user_id = @user_id
-        ORDER BY timestamp DESC
-    """
-    params = [bigquery.ScalarQueryParameter("user_id", "STRING", user_id)]
-    posts = []
-    for row in run_query(query, params=params):
-        posts.append({
-            "user_id":   row.user_id,
-            "post_id":   row.post_id,
-            "timestamp": str(row.timestamp),
-            "content":   row.content,
-            "image":     row.image,
-        })
-    return posts
-
-
-def get_genai_advice(user_id):
-    profile = get_user_profile(user_id)
-    if not profile:
-        return {
-            "advice_id": "genai-advice-1",
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "content":   "No user profile found. Visit the campus map to explore events near you!",
-            "image":     None,
-        }
-    prompt = f"""
-    You are a helpful campus advisor for a student events app.
-    Based on this user:
-    - Name: {profile['full_name']}
-    - Username: {profile['username']}
-    - Friends count: {len(profile['friends'])}
-    Write one short friendly tip (1-2 sentences) about exploring campus events or inviting friends.
-    """
-    try:
-        model   = _get_genai_model()
-        content = model.generate_content(prompt).text.strip()
-    except Exception:
-        content = "Check the campus map for events near you and invite a friend to join!"
-    return {
-        "advice_id": "genai-advice-1",
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "content":   content,
-        "image":     None,
+        "content": content,
+        "image": None,
     }
