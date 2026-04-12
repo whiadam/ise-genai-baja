@@ -1,1 +1,117 @@
+USABILITY TEST — Unit 4 Project
+Adam White | ise-genai-baja (Baja Campus Events App)
 
+---
+
+## Intro
+
+My name is Adam White and I'm part of the team working on the Baja Campus Events App. The app is a Streamlit-based tool that helps students find and keep track of campus events. I asked two people to help test two new features we are planning to add. I told them they were not being graded, just trying to help us figure out if the features made sense. I told them to say out loud what they were thinking as they went through the paper prototype so I could understand what was going through their head. I gave them a made-up persona to think from while doing the tasks.
+
+Participant 1: A college student who uses their phone a lot to find things to do on campus.
+Participant 2: A college student who mostly just goes to class and doesn't really follow campus events that much.
+
+---
+
+## Tasks
+
+### Feature 1 — Event Popularity Leaderboard
+
+Persona: You're a student looking for something to do this weekend and want to see what events other people on campus are actually going to.
+
+Task: Find out which campus event is getting the most attention right now and look into it more.
+
+### Feature 2 — Event Bookmarking and Saved Events
+
+Persona: You found a few events earlier in the week that you want to remember. You're back on the app and want to find them again without looking through the full list.
+
+Task: Find a way to save an event you're interested in so you can come back to it later.
+
+---
+
+## Notes
+
+### Participant 1
+
+Feature 1:
+- Went straight to the leaderboard tab without much hesitation
+- Looked at the list and kind of paused before tapping on the first event, wasn't sure if it was clickable
+- Said "oh okay" when the detail screen came up with the graph
+- Didn't notice the trending arrows right away, had to look twice
+
+Feature 2:
+- Looked for a save button for a little bit before finding the star icon
+- Tapped the star and then looked around to figure out where the saved event went
+- Wasn't immediately sure where the "My Saved Events" tab was since it blended in with the other tabs
+- Once they found it they said it made sense
+
+### Participant 2
+
+Feature 1:
+- Took a little longer to find the leaderboard, initially went to the regular events list
+- Wasn't sure what the trending arrows meant at first
+- Said "I guess this is like a top events thing" before figuring it out
+- Didn't really interact with the graph, just looked at the rankings
+
+Feature 2:
+- Asked what the star icon was for before tapping it
+- After tapping it and seeing it fill in, said "oh so it saves it"
+- Went looking for saved events in the wrong tab first
+- Found the right tab after a second and completed the task
+
+---
+
+## Feedback
+
+### Participant 1
+
+Feature 1:
+- Said it was pretty easy once they figured out they could tap on the events
+- "I didn't know the list was clickable at first, maybe make it more obvious"
+- Thought the graph was useful but said it felt a little small
+- Rated the task about a 4 out of 5 for ease
+
+Feature 2:
+- Said the star made sense once they tapped it but wasn't obvious before that
+- "I didn't know where my saved stuff went, I had to look around for it"
+- Thought the category filter bar at the top was a good idea
+- Rated the task about a 3 out of 5 for ease
+
+### Participant 2
+
+Feature 1:
+- Said they would have gone to the leaderboard first if there was a better label on it
+- "I wasn't sure what the arrows meant, like is that popularity or something else"
+- Thought the feature overall was cool once they understood what it was showing
+- Rated the task about a 3 out of 5 for ease
+
+Feature 2:
+- Said the star icon needed a label or tooltip because they didn't know what it did
+- "Once I found the saved tab it was fine but finding it the first time was kind of confusing"
+- Thought saving events was a useful feature in general
+- Rated the task about a 3 out of 5 for ease
+
+---
+
+## Results
+
+### Issues Found
+
+Issue 1: Event cards on the leaderboard didn't look obviously tappable
+- Hypothesis: The cards didn't have any visual cue like an arrow or underline to suggest they were interactive
+- Participant quote: "I didn't know the list was clickable at first, maybe make it more obvious"
+- Remedy: Add a small arrow icon or a subtle highlight effect on hover to show the cards are clickable
+
+Issue 2: Trending arrows were confusing
+- Hypothesis: The arrows alone didn't have enough context, users weren't sure if they meant popularity, views, or something else
+- Participant quote: "I wasn't sure what the arrows meant, like is that popularity or something else"
+- Remedy: Add a short label next to the arrow like "Trending up this week" or a small percentage number so the meaning is clear
+
+Issue 3: Star icon purpose wasn't obvious before tapping
+- Hypothesis: A plain star with no label looks decorative, not functional, especially if users haven't seen it before
+- Participant quote: "I didn't know what it was for before I tapped it"
+- Remedy: Add a small tooltip or label on hover that says "Save event" so users know what it does before they tap
+
+Issue 4: Saved Events tab was hard to find
+- Hypothesis: The tab label probably looked similar to the other tabs and didn't stand out enough as a personal/saved section
+- Participant quote: "I didn't know where my saved stuff went, I had to look around for it"
+- Remedy: Rename the tab to something more personal like "Saved" with a bookmark icon so it's easier to spot
