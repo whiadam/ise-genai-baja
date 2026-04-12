@@ -15,3 +15,7 @@ Tasks:
 - Add engagement tracking to the existing event_module so we can count bookmarks and signups (5 story points, high priority)
 - Build the detail view screen with the stats and trend graph (3 story points, medium priority)
 - Add the trending indicator arrows and percentage change calculations (2 story points, low priority)
+
+Feature 2: Event Bookmarking and Saved Events
+ 
+So right now the app just shows all the campus events in one big list and theres no way to save the ones you actually care about. This feature adds a little star icon on each event card so you can bookmark it. When you tap the star it fills in and saves that event to a "My Saved Events" tab so you can find it later without scrolling through everything again. Theres also a filter bar at the top with categories like All, Academic, Social, Sports, and Career so you can narrow down what you see. It works on both the main events tab and your saved events tab. We're keeping it simple and just using session state so your bookmarks last while you're using the app but reset when you close the browser. No database needed or anything crazy like that.
