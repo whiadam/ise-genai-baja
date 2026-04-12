@@ -1,0 +1,17 @@
+FEATURES.TXT — Unit 4 Project
+Adam White | ise-genai-baja (Baja Campus Events App)
+ 
+Feature 1: Event Popularity Leaderboard
+ 
+So basically this feature is gonna show students which events on campus are the most popular right now. 
+It ranks them by how many people bookmarked or signed up for them and shows if its trending up or down. 
+You can filter by this week, this month, or all time. 
+When you tap on an event it opens up more details like a little graph showing how the engagement has 
+been going and you can bookmark it or share it with friends. 
+We think this will help students find cool stuff to do instead of just scrolling through a boring list of events nobody cares about.
+ 
+Tasks:
+- Create leaderboard.py module with the main page layout and ranking logic (3 story points, high priority)
+- Add engagement tracking to the existing event_module so we can count bookmarks and signups (5 story points, high priority)
+- Build the detail view screen with the stats and trend graph (3 story points, medium priority)
+- Add the trending indicator arrows and percentage change calculations (2 story points, low priority)
