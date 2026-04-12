@@ -1,0 +1,93 @@
+
+<h2 class="sr-only">Hand-drawn style paper prototype for the event popularity leaderboard main screen</h2>
+<div style="padding: 1rem 0;">
+<p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 6px; letter-spacing: 0.04em; text-transform: uppercase;">Feature 1 — screen 1</p>
+<p style="font-size: 18px; font-weight: 500; margin: 0 0 1.5rem; color: var(--color-text-primary);">Event popularity leaderboard</p>
+
+<div style="background: #d4d0c8; border-radius: 4px; padding: 2rem; display: flex; justify-content: center;">
+  <svg viewBox="0 0 360 520" width="360" height="520" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Comic Sans MS', 'Segoe Print', cursive, sans-serif;">
+
+    <!-- Dark background like the uploaded image -->
+    <rect x="10" y="10" width="340" height="500" rx="4" fill="#4a2028" stroke="#222" stroke-width="2"/>
+
+    <!-- Title -->
+    <text x="180" y="50" text-anchor="middle" fill="white" font-size="16" font-weight="bold" letter-spacing="1.5">EVENT LEADERBOARD</text>
+
+    <!-- Tab buttons row -->
+    <rect x="35" y="70" width="90" height="34" rx="3" fill="#e8e4a0" stroke="#333" stroke-width="1.5"/>
+    <text x="80" y="92" text-anchor="middle" fill="#333" font-size="13" font-weight="bold">This week</text>
+
+    <rect x="135" y="70" width="90" height="34" rx="3" fill="#f0ece0" stroke="#555" stroke-width="1"/>
+    <text x="180" y="92" text-anchor="middle" fill="#555" font-size="13">Month</text>
+
+    <rect x="235" y="70" width="90" height="34" rx="3" fill="#f0ece0" stroke="#555" stroke-width="1"/>
+    <text x="280" y="92" text-anchor="middle" fill="#555" font-size="13">All time</text>
+
+    <!-- Leaderboard entries -->
+
+    <!-- Entry 1 -->
+    <rect x="35" y="120" width="290" height="65" rx="3" fill="#f0ece0" stroke="#555" stroke-width="1"/>
+    <!-- Rank circle -->
+    <circle cx="60" cy="152" r="16" fill="#e8e4a0" stroke="#333" stroke-width="1.5"/>
+    <text x="60" y="158" text-anchor="middle" fill="#333" font-size="18" font-weight="bold">1</text>
+    <!-- Event name -->
+    <text x="85" y="145" fill="#333" font-size="13" font-weight="bold">Spring Career Fair</text>
+    <text x="85" y="162" fill="#777" font-size="11">Apr 18 - Titan Student Union</text>
+    <!-- Score -->
+    <text x="300" y="145" text-anchor="end" fill="#2a7a2a" font-size="16" font-weight="bold">342</text>
+    <!-- Arrow up drawn rough -->
+    <polygon points="290,158 296,168 284,168" fill="#2a7a2a" stroke="#2a7a2a" stroke-width="1"/>
+    <text x="300" y="176" text-anchor="end" fill="#2a7a2a" font-size="10">+24%</text>
+
+    <!-- Entry 2 -->
+    <rect x="35" y="195" width="290" height="65" rx="3" fill="#f0ece0" stroke="#555" stroke-width="1"/>
+    <circle cx="60" cy="227" r="16" fill="#d44" stroke="#333" stroke-width="1.5"/>
+    <text x="60" y="233" text-anchor="middle" fill="white" font-size="18" font-weight="bold">2</text>
+    <text x="85" y="220" fill="#333" font-size="13" font-weight="bold">AI/ML Workshop</text>
+    <text x="85" y="237" fill="#777" font-size="11">Apr 20 - CS Building 300</text>
+    <text x="300" y="220" text-anchor="end" fill="#2a7a2a" font-size="16" font-weight="bold">281</text>
+    <polygon points="290,233 296,243 284,243" fill="#2a7a2a" stroke="#2a7a2a" stroke-width="1"/>
+    <text x="300" y="251" text-anchor="end" fill="#2a7a2a" font-size="10">+18%</text>
+
+    <!-- Entry 3 -->
+    <rect x="35" y="270" width="290" height="65" rx="3" fill="#f0ece0" stroke="#555" stroke-width="1"/>
+    <circle cx="60" cy="302" r="16" fill="#d4a030" stroke="#333" stroke-width="1.5"/>
+    <text x="60" y="308" text-anchor="middle" fill="white" font-size="18" font-weight="bold">3</text>
+    <text x="85" y="295" fill="#333" font-size="13" font-weight="bold">Cinco de Mayo Fest</text>
+    <text x="85" y="312" fill="#777" font-size="11">May 5 - Quad Lawn</text>
+    <text x="300" y="295" text-anchor="end" fill="#aa3333" font-size="16" font-weight="bold">198</text>
+    <!-- Arrow down -->
+    <polygon points="290,303 296,293 284,293" fill="#aa3333" stroke="#aa3333" stroke-width="1" transform="rotate(180,290,298)"/>
+    <text x="300" y="321" text-anchor="end" fill="#aa3333" font-size="10">-3%</text>
+
+    <!-- Entry 4 -->
+    <rect x="35" y="345" width="290" height="65" rx="3" fill="#f0ece0" stroke="#555" stroke-width="1"/>
+    <circle cx="60" cy="377" r="16" fill="#d44" stroke="#333" stroke-width="1.5"/>
+    <text x="60" y="383" text-anchor="middle" fill="white" font-size="18" font-weight="bold">4</text>
+    <text x="85" y="370" fill="#333" font-size="13" font-weight="bold">Open Mic Night</text>
+    <text x="85" y="387" fill="#777" font-size="11">Apr 22 - Becker Amphitheater</text>
+    <text x="300" y="370" text-anchor="end" fill="#2a7a2a" font-size="16" font-weight="bold">154</text>
+    <polygon points="290,383 296,393 284,393" fill="#2a7a2a" stroke="#2a7a2a" stroke-width="1"/>
+    <text x="300" y="401" text-anchor="end" fill="#2a7a2a" font-size="10">+7%</text>
+
+    <!-- Annotation arrow pointing to yellow highlight -->
+    <line x1="30" y1="88" x2="15" y2="75" stroke="#e8e4a0" stroke-width="2"/>
+    <text x="5" y="68" fill="#e8e4a0" font-size="9" transform="rotate(-15,5,68)">active tab</text>
+
+    <!-- Chat input at bottom -->
+    <rect x="35" y="430" width="250" height="34" rx="3" fill="#f0ece0" stroke="#555" stroke-width="1"/>
+    <text x="50" y="452" fill="#999" font-size="12">Search events...</text>
+    <!-- Search icon square -->
+    <rect x="295" y="430" width="30" height="34" rx="3" fill="#333" stroke="#555" stroke-width="1"/>
+    <polygon points="310,440 310,455 303,448" fill="white"/>
+
+    <!-- Bottom nav bar -->
+    <line x1="35" y1="480" x2="325" y2="480" stroke="#666" stroke-width="1"/>
+    <text x="65" y="498" text-anchor="middle" fill="#999" font-size="11">Map</text>
+    <text x="140" y="498" text-anchor="middle" fill="#999" font-size="11">Events</text>
+    <text x="220" y="498" text-anchor="middle" fill="#e8e4a0" font-size="11" font-weight="bold">Trending</text>
+    <text x="295" y="498" text-anchor="middle" fill="#999" font-size="11">Alerts</text>
+
+  </svg>
+</div>
+</div>
