@@ -5,9 +5,20 @@
 #############################################################################
 
 from datetime import datetime
+from google.cloud import bigquery
 import vertexai
 from vertexai.generative_models import GenerativeModel
-from config import run_query, get_client, PROJECT_ID, DATASET, PROJECT_DATASET, VERTEX_LOCATION, MODEL_NAME
+from config import (
+    get_client,
+    PROJECT_ID,
+    DATASET,
+    PROJECT_DATASET,
+    VERTEX_LOCATION,
+    MODEL_NAME,
+)
+
+# Create the BigQuery client once
+client = get_client()
 
 
 def _get_genai_model():
@@ -16,7 +27,7 @@ def _get_genai_model():
 
 
 def get_active_polls():
-    """Returns active polls from the database, or fallback demo data."""
+    """Returns active polls from the database."""
     query = f"""
         SELECT PollId, PollQuestion, CreatedAt, Category, IsActive
         FROM `{PROJECT_DATASET}.campus_voice_polls`
@@ -38,7 +49,7 @@ def get_active_polls():
 
 
 def get_issues():
-    """Returns all campus issues from the database, or fallback demo data."""
+    """Returns all campus issues from the database."""
     query = f"""
         SELECT issue_id, Title, Description, Time_stamp, Rating
         FROM `{PROJECT_DATASET}.campus_voice_issues`
@@ -62,10 +73,11 @@ def get_filtered_issues(min_rating):
     """Returns issues with a rating greater than or equal to the given value."""
     query = f"""
         SELECT issue_id, Title, Description, Time_stamp, Rating
-        FROM `{PROJECT_ID}.{DATASET}.campus_voice_issues`
+        FROM `{PROJECT_DATASET}.campus_voice_issues`
         WHERE Rating >= @min_rating
         ORDER BY Time_stamp DESC
     """
+
     job_config = bigquery.QueryJobConfig(
         query_parameters=[
             bigquery.ScalarQueryParameter("min_rating", "INT64", min_rating)
@@ -87,7 +99,7 @@ def get_filtered_issues(min_rating):
 
 
 def get_facility_ratings():
-    """Returns facility ratings from the database, or fallback demo data."""
+    """Returns facility ratings from the database."""
     query = f"""
         SELECT RatingId, UserId, FacilityName, Rating, Comment, CreatedAt
         FROM `{PROJECT_DATASET}.campus_voice_facility_ratings`
@@ -110,14 +122,17 @@ def get_facility_ratings():
 
 def get_genai_data(user_id="user1"):
     """Uses Vertex AI to generate a short Campus Voice summary based on DB data."""
-    polls   = get_active_polls()
-    issues  = get_issues()
+    polls = get_active_polls()
+    issues = get_issues()
     ratings = get_facility_ratings()
 
-    issue_count  = len(issues)
-    poll_count   = len(polls)
+    issue_count = len(issues)
+    poll_count = len(polls)
     rating_count = len(ratings)
-    avg_rating   = (sum(r["rating"] for r in ratings) / rating_count) if rating_count else 0
+    avg_rating = (
+        sum(r["rating"] for r in ratings) / rating_count
+        if rating_count else 0
+    )
 
     prompt = f"""
     You are helping summarize activity in a student campus feedback app called Campus Voice.
@@ -133,7 +148,7 @@ def get_genai_data(user_id="user1"):
     """
 
     try:
-        model   = _get_genai_model()
+        model = _get_genai_model()
         content = model.generate_content(prompt).text.strip()
     except Exception:
         content = (
@@ -148,3 +163,20 @@ def get_genai_data(user_id="user1"):
         "content": content,
         "image": None,
     }
+
+
+def get_trending_issues():
+    """Returns top trending issues using highest ratings."""
+    issues = get_issues()
+    return sorted(issues, key=lambda x: x["rating"], reverse=True)[:5]
+
+
+def get_map_issues():
+    """Returns issues with demo coordinates for map display."""
+    issues = get_issues()
+
+    for i, issue in enumerate(issues):
+        issue["lat"] = 38.92 + (i * 0.001)
+        issue["lon"] = -77.02 + (i * 0.001)
+
+    return issues
