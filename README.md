@@ -2,7 +2,6 @@
 (https://ise-genai-baja-q54bfbd5ga-uc.a.run.app/)
 ## Our Team
 
-Bryce Anderson <br>
 Adam White <br>
 Jeffery Perparas <br>
 Auriell Ferguson <br>
