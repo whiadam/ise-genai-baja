@@ -24,4 +24,5 @@ When you tap the star it fills in and saves that event to a "My Saved Events" ta
 without scrolling through everything again. 
 Theres also a filter bar at the top with categories like All, Academic, Social, Sports, and Career so you can narrow down what you see. 
 It works on both the main events tab and your saved events tab. 
-We're keeping it simple and just using session state so your bookmarks last while you're using the app but reset when you close the browser. No database needed or anything crazy like that.
+We're keeping it simple and just using session state so your bookmarks last while you're using the app but reset when you close the browser.
+No database needed or anything crazy like that.
