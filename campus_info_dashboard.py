@@ -33,3 +33,5 @@ def campus_info_dashboard():
         with st.spinner("Generating summary..."):
             summary = get_genai_data('user1')
             st.write(summary["content"])
+            
+campus_info_dashboard()
