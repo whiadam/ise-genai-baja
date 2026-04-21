@@ -18,8 +18,8 @@ class TestFlyerUpdater(unittest.TestCase):
 
     @staticmethod
     def _render_page():
-        from flyer_updater.flyer_view import display_flyer_updater_page
-        display_flyer_updater_page()
+        from flyer_updater.flyer_view import render_landing_page
+        render_landing_page()
 
     def test_page_renders(self):
         self.assertFalse(self.at.exception)
