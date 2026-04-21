@@ -1,13 +1,18 @@
 STYLE=f"""
     <style>
-        [data-testid="stAppViewContainer"]{{
-             background-color: #ffffff;
+        [data-testid="stChatMessage"],
+        [data-testid="stChatMessage"] * {{
+        color: #ffffff;
         }}
         .st-key-chat_container{{
             border: none;
             border-radius: 10px;
             border-bottom-left-radius: 0px;
             border-bottom-right-radius: 0px;
+        }}
+        .st-key-input_container [class*="st-key-audio_file_upload"] > div > div:nth-child(2) {{
+            height: 40px !important;
+            min-height: 40px !important;
         }}
         .st-key-input_container{{
             border: none;
@@ -16,17 +21,16 @@ STYLE=f"""
             border-bottom-right-radius: 10px;
         }}
         .st-key-page_container{{
+            background: linear-gradient(to top, #012169, #00539B);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             border-radius: 10px;
         }}
         .st-key-camera,.st-key-upload{{
-            background: #8f283a;
-            margin-top: -15px;
-            margin-bottom: -125px;
+            /* margin-top: -15px; */
+            /* margin-bottom: -125px; */
             border-radius: 0px;
         }}
         .st-key-landing_page_container{{
-            background: linear-gradient(to top, #110b16, #8f283a);
             border-radius: 0px;
             border-bottom-left-radius: 10px;
             border-bottom-right-radius: 10px;
@@ -34,17 +38,15 @@ STYLE=f"""
         }}
         .st-key-header{{
             text-shadow:2px 2px 4px rgba(0,0,0,0.5);
-            margin-bottom:-45px;
+            /* margin-bottom:-45px; */
         }}
         .st-key-top{{
+            color: #ffffff;
             text-align: center;
-            color: #D3AF37;
-            background: linear-gradient(to top, #8f283a, #8f283a);
             padding: 10px;
             margin-bottom:-20px;
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         }}
     </style>
 """

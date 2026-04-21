@@ -4,18 +4,30 @@ import uuid
 from flyer_updater.agents.agent_service import query_agent, get_or_create_session
 from flyer_updater.flyer_style import STYLE
 
+def render_landing_page():
+    st.html(STYLE)
+    _init_session_state()
+    with st.container(key="page_container"):
+        input_mode= _render_top_selector()
+        _render_media_input(input_mode)
+        chat_container, prompt = _render_chat_area()
+        if prompt:
+                _process_agent_query(chat_container, prompt=prompt)
+        _handle_pending_media(chat_container)
 
 def _init_session_state():
     defaults = {
             "media_key": 0,
-            "user_id": str(uuid.uuid4()),
             "messages": [], 
             "pending_image": None,
+            "pending_audio": None,
             "active_tab":0,
     }
     for k,v in defaults.items():
         if k not in st.session_state:
             st.session_state[k] = v
+    if "user_id" not in st.session_state:
+        st.session_state.user_id = str(uuid.uuid4())
     if "session_id" not in st.session_state:
         st.session_state.session_id = get_or_create_session(st.session_state.user_id)
 
@@ -25,99 +37,99 @@ def _render_top_selector():
             st.header("Event Creation Assistant", text_alignment="center")
         with st.container(key="selector_container", horizontal_alignment="center"):
             return st.radio(
-                    "", 
+                    "Input Mode", 
                     ["Chat", "Camera", "Upload"], 
                     key=f"selected_tab_{st.session_state.media_key}",
                     horizontal=True, 
                     index=st.session_state.active_tab,
+                    label_visibility="collapsed"
                     )
 
-def render_landing_page():
-    st.html(STYLE)
-    _init_session_state()
-
-
+def _render_media_input(input_mode):
     k = st.session_state.media_key
     image = None
-    input_selector = _render_top_selector()
-
-    if input_selector == "Camera":
+    if input_mode == "Camera":
         with st.container(key="camera"):
-            image = st.session_state.pending_image = st.camera_input(
+            image =  st.camera_input(
                 "Snap a Shot \U0001F4F8", key=f"camera_image_upload_{k}")
-    elif input_selector == "Upload":
+    elif input_mode == "Upload":
         with st.container(key="upload"):
-            image = st.session_state.pending_image = st.file_uploader(
-                "Upload an image of a flyer", type=["png", "jpg", "jpeg"], key=f"file_image_upload_{k}")
+            image = st.file_uploader(
+                "Upload an image of a flyer", 
+                type=["png", "jpg", "jpeg"], 
+                key=f"file_image_upload_{k}",
+                )
+    st.session_state.pending_image = image
 
+def _render_chat_area():
     with st.container(key="landing_page_container", gap="xxsmall"):
         chat_container = st.container(key="chat_container", height=350, gap="xxsmall")
         with chat_container:
-            messages_container = st.container()
+            _render_message_history()
 
         input_container = st.container(
-            key="input_container", height=200, vertical_alignment="center",
-            horizontal_alignment="center", gap=None)
-
-        with messages_container:
-            for msg in st.session_state.messages:
-                with st.chat_message(msg["role"], width="content"):
-                    st.write(msg["content"])
+            key="input_container", 
+            height= 150, 
+            vertical_alignment="center",
+            horizontal_alignment="center", 
+            gap="small",
+            )
 
         with input_container:
             prompt = st.chat_input("Describe an Event!")
-            audio = st.session_state.pending_audio = st.audio_input("", key=f"audio_file_upload_{k}")
+            audio = st.audio_input(
+                    "Record Audio note", 
+                    key=f"audio_file_upload_{st.session_state.media_key}",
+                    label_visibility="collapsed"
+                    )
+            st.session_state.pending_audio = audio
 
-        if prompt:
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            with chat_container:
-                with st.chat_message("user", width="content"):
-                    st.write(prompt)
-                with st.chat_message("assistant"):
-                    with st.spinner("Working..."):
-                        response = query_agent(
-                            user_id=st.session_state.user_id,
-                            session_id=st.session_state.session_id,
-                            message=prompt,
-                        )
-                    st.write_stream(_stream_writer(response), cursor="...")
-                    st.session_state.messages.append({"role": "assistant", "content": response})
+    return chat_container, prompt
 
-        has_media = image or audio
-        if has_media:
-            if image and audio:
-                st.session_state.pending_display = "[Uploaded Image with Audio note]"
-            elif image:
-                st.session_state.pending_display = "[Uploaded Image]"
-            else:
-                st.session_state.pending_display = "[Audio Note]"
+def _render_message_history():
+    for msg in st.session_state.messages:
+        with st.chat_message(msg["role"], width="content"):
+            st.write(msg["content"])
 
-        if st.session_state.pending_image or st.session_state.pending_audio:
-            pending_image = st.session_state.pop("pending_image", None)
-            pending_audio = st.session_state.pop("pending_audio", None)
-            pending_display = st.session_state.pop("pending_display", None)
-            st.session_state.media_key += 1
-            st.session_state.active_tab = 0
+def _process_agent_query(chat_container,prompt=None,image=None, audio=None, display=None):
+    st.session_state.messages.append({"role": "user", "content": prompt or display })
+    with chat_container:
+        with st.chat_message("user", width="content"):
+            st.write(prompt or display)
+        with st.chat_message("assistant"):
+            with st.spinner("Working..."):
+                response = query_agent(
+                    user_id=st.session_state.user_id,
+                    session_id=st.session_state.session_id,
+                    message=prompt,
+                    image=image,
+                    audio=audio,
+                )
+            st.write_stream(_stream_writer(response), cursor="...")
+            st.session_state.messages.append({"role": "assistant", "content": response})
 
-            st.session_state.messages.append({"role": "user", "content": pending_display})
-            with chat_container:
-                with st.chat_message("user"):
-                    st.write(pending_display)
-                with st.chat_message("assistant"):
-                    with st.spinner("Working..."):
-                        response = query_agent(
-                            user_id=st.session_state.user_id,
-                            session_id=st.session_state.session_id,
-                            message="",
-                            image=pending_image,
-                            audio=pending_audio
-                        )
-                    st.write_stream(_stream_writer(response), cursor="...")
-                    st.session_state.messages.append({"role": "assistant", "content": response})
-            st.rerun()
+
+def _handle_pending_media(chat_container):
+    if not (st.session_state.pending_image or st.session_state.pending_audio):
+        return
+    pending_image=st.session_state.pop("pending_image", None)
+    pending_audio=st.session_state.pop("pending_audio", None)
+    display = _format_media_display(pending_image,pending_audio)
+    st.session_state.media_key+=1
+    st.session_state.active_tab = 0
+    _process_agent_query(chat_container,image=pending_image,audio=pending_audio,display=display)
+    st.rerun()
+
+def _format_media_display(image,audio):
+    if image and audio:
+        return "[Uploaded Image with Audio note]"
+    elif image:
+        return "[Uploaded Image]"
+    else:
+        return "[Audio Note]"
 
 
 def _stream_writer(response):
     for letter in response:
         yield letter
-        time.sleep(0.05)
+        time.sleep(0.01)
