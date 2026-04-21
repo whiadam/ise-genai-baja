@@ -4,3 +4,54 @@ address = '0.0.0.0'
 enableCORS = false
 enableXsrfProtection = false
 runOnSave = true
+
+[[theme.fontFaces]]
+family = "Quattrocento"
+url = "app/static/Quattrocento-Regular.ttf"
+style = "normal"
+weight = 400
+
+[[theme.fontFaces]]
+family = "Quattrocento"
+url = "app/static/Quattrocento-Bold.ttf"
+style = "normal"
+weight = 700
+
+[[theme.fontFaces]]
+family = "SpaceMono"
+url = "app/static/SpaceMono-Regular.ttf"
+style = "normal"
+weight = 400
+
+[[theme.fontFaces]]
+family = "SpaceMono"
+url = "app/static/SpaceMono-Bold.ttf"
+style = "normal"
+weight = 700
+
+[theme]
+primaryColor = "#00539B"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#E2E6ED"
+textColor = "#262626"
+linkColor = "#00539B"
+borderColor = "#988675"
+showWidgetBorder = true
+baseRadius = "0.75rem"
+buttonRadius = "full"
+font = "Quattrocento"
+headingFontWeights = [700, 700, 600, 600, 600, 600]
+headingFontSizes = ["3rem", "2rem"]
+codeFont = "SpaceMono"
+codeFontSize = ".75rem"
+codeBackgroundColor = "#E2E6ED"
+showSidebarBorder = true
+chartCategoricalColors = ["#00539B", "#012169", "#988675"]
+
+[theme.sidebar]
+backgroundColor = "#012169"
+secondaryBackgroundColor = "#00539B"
+textColor = "#ffffff"
+primaryColor = "#012169"
+headingFontSizes = ["1.6rem", "1.4rem", "1.2rem"]
+dataframeHeaderBackgroundColor = "#003A6B"
