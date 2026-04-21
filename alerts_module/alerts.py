@@ -24,6 +24,8 @@ def _ensure_alert_state() -> None:
         st.session_state["dismissed_banner_ids"] = set()
     if "editing_alert_id" not in st.session_state:
         st.session_state["editing_alert_id"] = None
+    if "active_alert_index" not in st.session_state:
+        st.session_state["active_alert_index"] = 0
 
 
 def _parse_dt(d: date, t: time) -> datetime:
@@ -114,6 +116,72 @@ def _normalize_bigquery_alerts(bigquery_alerts: list[dict[str, Any]]) -> list[di
     return normalized_alerts
 
 
+def _get_urgent_alert_index(active_alerts: list[dict[str, Any]]) -> int:
+    """
+    Finds the index of the alert with the earliest trigger time.
+
+    Lines vibe-coded with GPT-5.2 Thinking.
+    """
+    urgent_index = 0
+    earliest_time = None
+
+    for i, alert in enumerate(active_alerts):
+        trigger_time = _compute_trigger_time(alert)
+        if trigger_time is not None and (earliest_time is None or trigger_time < earliest_time):
+            earliest_time = trigger_time
+            urgent_index = i
+
+    return urgent_index
+
+
+def _render_active_alert_card(alert: dict[str, Any]) -> None:
+    """
+    Renders a single active alert card.
+
+    Lines vibe-coded with GPT-5.2 Thinking.
+    """
+    trigger = _compute_trigger_time(alert)
+    trigger_str = trigger.strftime("%a %I:%M %p") if trigger else "N/A"
+
+    with st.container(border=True):
+        st.markdown(f"**{alert['title']}**")
+        st.write(f"{alert['category']} • {alert['alert_type']}")
+        st.write(f"Next trigger: {trigger_str}")
+
+        if alert.get("alert_description"):
+            st.write(f"Description: {alert['alert_description']}")
+
+        if alert.get("event_id") is not None:
+            st.write(f"Event ID: {alert['event_id']}")
+
+        c1, c2, c3 = st.columns(3)
+        is_database_alert = str(alert["id"]).startswith("db_")
+
+        with c1:
+            if is_database_alert:
+                st.button("Edit", key=f"edit_{alert['id']}", disabled=True)
+            else:
+                if st.button("Edit", key=f"edit_{alert['id']}"):
+                    st.session_state["editing_alert_id"] = alert["id"]
+                    st.rerun()
+
+        with c2:
+            if is_database_alert:
+                st.button("Disable", key=f"disable_{alert['id']}", disabled=True)
+            else:
+                if st.button("Disable", key=f"disable_{alert['id']}"):
+                    alert["enabled"] = False
+                    st.rerun()
+
+        with c3:
+            if is_database_alert:
+                st.button("Delete", key=f"delete_{alert['id']}", disabled=True)
+            else:
+                if st.button("Delete", key=f"delete_{alert['id']}"):
+                    st.session_state["alerts"].remove(alert)
+                    st.rerun()
+
+
 def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None = None) -> None:
     """
     Displays and manages alerts for the Campus Info App.
@@ -121,7 +189,8 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
     Sections:
     - Top notification banner
     - Create alert + settings
-    - Active alerts (edit / disable / delete)
+    - Active alerts carousel
+    - Edit alert
     - Upcoming alerts (filter + search)
 
     Lines vibe-coded with GPT-5.2 Thinking.
@@ -145,10 +214,10 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
     # =======================
     enabled_alerts = [a for a in all_alerts if a.get("enabled", True)]
     upcoming_pairs = []
-    for a in enabled_alerts:
-        tt = _compute_trigger_time(a)
-        if tt and tt >= now:
-            upcoming_pairs.append((tt, a))
+    for alert in enabled_alerts:
+        trigger_time = _compute_trigger_time(alert)
+        if trigger_time and trigger_time >= now:
+            upcoming_pairs.append((trigger_time, alert))
     upcoming_pairs.sort(key=lambda x: x[0])
 
     if upcoming_pairs:
@@ -247,7 +316,7 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
                         "remind_at": remind_at,
                         "delivery": {"in_app": in_app, "email": email, "sms": sms},
                         "enabled": True,
-                        "created_at": datetime.now(),
+                        "created_at": datetime.now(timezone.utc),
                         "source": "local",
                         "alert_description": None,
                         "event_id": None,
@@ -257,7 +326,7 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
                 st.success("Alert created!")
 
     # =======================
-    # Active Alerts
+    # Active Alerts Carousel
     # =======================
     with col_right:
         st.markdown("### Active Alerts")
@@ -265,51 +334,42 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
         active = [a for a in all_alerts if a.get("enabled", True)]
         if not active:
             st.info("No active alerts yet.")
+        else:
+            if st.session_state["active_alert_index"] >= len(active):
+                st.session_state["active_alert_index"] = 0
 
-        for a in list(all_alerts):
-            if not a.get("enabled", True):
-                continue
+            nav_left, nav_center, nav_right = st.columns([1, 2, 1])
 
-            trigger = _compute_trigger_time(a)
-            trigger_str = trigger.strftime("%a %I:%M %p") if trigger else "N/A"
+            with nav_left:
+                if st.button("⬅", key="alerts_prev_card", use_container_width=True):
+                    st.session_state["active_alert_index"] = (
+                        st.session_state["active_alert_index"] - 1
+                    ) % len(active)
+                    st.rerun()
 
-            with st.container(border=True):
-                st.markdown(f"**{a['title']}**")
-                st.write(f"{a['category']} • {a['alert_type']}")
-                st.write(f"Next trigger: {trigger_str}")
+            with nav_center:
+                current_index = st.session_state["active_alert_index"]
+                st.markdown(
+                    f"<div style='text-align: center; padding-top: 0.5rem;'><strong>"
+                    f"Alert {current_index + 1} of {len(active)}"
+                    f"</strong></div>",
+                    unsafe_allow_html=True,
+                )
 
-                if a.get("alert_description"):
-                    st.write(f"Description: {a['alert_description']}")
+            with nav_right:
+                if st.button("➡", key="alerts_next_card", use_container_width=True):
+                    st.session_state["active_alert_index"] = (
+                        st.session_state["active_alert_index"] + 1
+                    ) % len(active)
+                    st.rerun()
 
-                if a.get("event_id") is not None:
-                    st.write(f"Event ID: {a['event_id']}")
+            urgent_index = _get_urgent_alert_index(active)
+            if st.button("Jump to Urgent", key="alerts_jump_urgent", use_container_width=True):
+                st.session_state["active_alert_index"] = urgent_index
+                st.rerun()
 
-                c1, c2, c3 = st.columns(3)
-                is_database_alert = str(a["id"]).startswith("db_")
-
-                with c1:
-                    if is_database_alert:
-                        st.button("Edit", key=f"edit_{a['id']}", disabled=True)
-                    else:
-                        if st.button("Edit", key=f"edit_{a['id']}"):
-                            st.session_state["editing_alert_id"] = a["id"]
-                            st.rerun()
-
-                with c2:
-                    if is_database_alert:
-                        st.button("Disable", key=f"disable_{a['id']}", disabled=True)
-                    else:
-                        if st.button("Disable", key=f"disable_{a['id']}"):
-                            a["enabled"] = False
-                            st.rerun()
-
-                with c3:
-                    if is_database_alert:
-                        st.button("Delete", key=f"delete_{a['id']}", disabled=True)
-                    else:
-                        if st.button("Delete", key=f"delete_{a['id']}"):
-                            st.session_state["alerts"].remove(a)
-                            st.rerun()
+            current_alert = active[st.session_state["active_alert_index"]]
+            _render_active_alert_card(current_alert)
 
         # =======================
         # Edit Alert
@@ -350,13 +410,13 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
             q = st.text_input("Search alerts", key="alerts_upcoming_search")
 
         rows = []
-        for tt, a in upcoming_pairs:
-            if category_filter != "All" and a["category"] != category_filter:
+        for trigger_time, alert in upcoming_pairs:
+            if category_filter != "All" and alert["category"] != category_filter:
                 continue
-            if q and q.lower() not in a["title"].lower():
+            if q and q.lower() not in alert["title"].lower():
                 continue
-            source = "Events" if a.get("event_name") else ("Personal" if a["alert_type"] == "Personal Reminder" else "System")
-            rows.append({"Time": tt.strftime("%I:%M %p"), "Alert": a["title"], "Source": source})
+            source = "Events" if alert.get("event_name") else ("Personal" if alert["alert_type"] == "Personal Reminder" else "System")
+            rows.append({"Time": trigger_time.strftime("%I:%M %p"), "Alert": alert["title"], "Source": source})
 
         if rows:
             st.dataframe(rows, hide_index=True, width="stretch")
