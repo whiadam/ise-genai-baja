@@ -78,13 +78,8 @@ def get_filtered_issues(min_rating):
         ORDER BY Time_stamp DESC
     """
 
-    job_config = bigquery.QueryJobConfig(
-        query_parameters=[
-            bigquery.ScalarQueryParameter("min_rating", "INT64", min_rating)
-        ]
-    )
-
-    rows = run_query(query, params=job_config)
+    params = [  bigquery.ScalarQueryParameter("min_rating", "INT64", min_rating)]
+    rows = run_query(query, params=params )
 
     issues = []
     for row in rows:
