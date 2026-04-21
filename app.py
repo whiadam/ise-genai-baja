@@ -4,59 +4,18 @@
 # This file contains the entrypoint for the app.
 #
 #############################################################################
-
 import streamlit as st
-from alerts_module.alerts import display_alerts
-from flyer_updater.flyer_view import display_flyer_updater_page
-from data_fetcher import get_active_polls, get_issues, get_genai_data
-
 
 def register_pages():
     """Put modules(pages) in the return statement here"""
     return [
-        st.Page(display_app_page, title="Home", default=True),
-        st.Page(display_flyer_updater_page, title="Flyer Updater"),
+        st.Page("campus_map.py", title="Campus Map", default = True),
+        st.Page("campus_info_dashboard.py", title="Dashboard"),
+        st.Page("flyer_updater/flyer_view.py", title="Flyer Updater"),
         st.Page("campus_voice.py", title="Campus Voice"),
-        st.Page(display_alerts, title="Alerts"),
-        st.Page("campus_map.py", title="Campus Map"),
+        st.Page("alerts_module/alerts_view.py"   , title="Alerts"),
         st.Page("event_module/view.py", title="Events"),
     ]
-
-
-def display_app_page():
-    """Displays the home page of the app."""
-    st.title("Campus Info App")
-    st.caption("Logged in as student user")
-    st.divider()
-
-    polls = get_active_polls()
-    issues = get_issues()
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.subheader("Quick Poll Preview")
-        if polls:
-            for poll in polls[:3]:
-                st.write(f"- {poll['poll_question']}")
-        else:
-            st.info("No active polls right now.")
-
-    with col2:
-        st.subheader("Recent Issues Preview")
-        if issues:
-            for issue in issues[:3]:
-                st.write(f"- {issue['title']}")
-        else:
-            st.info("No recent issues right now.")
-
-    st.divider()
-    if st.button("Generate AI Summary"):
-        with st.spinner("Generating summary..."):
-            summary = get_genai_data('user1')
-            st.write(summary["content"])
-
-
 if __name__ == '__main__':
     nav = st.navigation(register_pages())
     nav.run()
