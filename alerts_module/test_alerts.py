@@ -16,6 +16,7 @@ class TestAlertsModule(unittest.TestCase):
         return """
     import streamlit as st
     from datetime import datetime, timedelta
+    from unittest.mock import patch
 
     try:
         from alerts_module.alerts import display_alerts
@@ -23,8 +24,9 @@ class TestAlertsModule(unittest.TestCase):
         from alerts import display_alerts
 
     events = [{"name": "Test Event", "start": datetime.now().replace(second=0, microsecond=0) + timedelta(hours=2)}]
-
-    display_alerts(user_id="user1", events=events)
+    
+    with patch("alerts_module.alerts.get_all_alerts", return_value=[]):
+        display_alerts(user_id="user1", events=events)
     """
 
     def test_create_alert_adds_to_list(self):
