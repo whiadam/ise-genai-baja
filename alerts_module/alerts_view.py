@@ -1,4 +1,4 @@
-from .alerts import display_alerts
+from alerts_module.alerts import display_alerts
 
 display_alerts()  
 
