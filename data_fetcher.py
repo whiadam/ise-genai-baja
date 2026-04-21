@@ -34,7 +34,7 @@ def get_active_polls():
         WHERE IsActive = TRUE
         ORDER BY CreatedAt DESC
     """
-    rows = client.query(query).result()
+    rows = run_query(query) 
 
     polls = []
     for row in rows:
@@ -55,7 +55,7 @@ def get_issues():
         FROM `{PROJECT_DATASET}.campus_voice_issues`
         ORDER BY Time_stamp DESC
     """
-    rows = client.query(query).result()
+    rows = run_query(query) 
 
     issues = []
     for row in rows:
@@ -84,7 +84,7 @@ def get_filtered_issues(min_rating):
         ]
     )
 
-    rows = client.query(query, job_config=job_config).result()
+    rows = run_query(query, params=job_config)
 
     issues = []
     for row in rows:
@@ -105,7 +105,7 @@ def get_facility_ratings():
         FROM `{PROJECT_DATASET}.campus_voice_facility_ratings`
         ORDER BY CreatedAt DESC
     """
-    rows = client.query(query).result()
+    rows = run_query(query)
 
     ratings = []
     for row in rows:
