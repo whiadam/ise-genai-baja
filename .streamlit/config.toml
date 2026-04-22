@@ -5,6 +5,9 @@ enableCORS = false
 enableXsrfProtection = false
 runOnSave = true
 
+[client]
+toolbarMode = "minimal"
+
 [[theme.fontFaces]]
 family = "Quattrocento"
 url = "app/static/Quattrocento-Regular.ttf"
@@ -53,5 +56,5 @@ backgroundColor = "#012169"
 secondaryBackgroundColor = "#00539B"
 textColor = "#ffffff"
 primaryColor = "#012169"
-headingFontSizes = ["1.6rem", "1.4rem", "1.2rem"]
+headingFontSizes = ["1.8rem", "1.6rem", "1.4rem"]
 dataframeHeaderBackgroundColor = "#003A6B"
