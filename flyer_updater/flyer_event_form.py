@@ -158,7 +158,7 @@ def _handle_event_submit(edited):
 
         st.session_state.messages.append({
             "role": "assistant",
-            "content": f"Event **{edited['event_title']}** was saved to the calendar!",
+            "content": f"Event **{edited['event_title']}** with ID#**{event_id}** was saved to the calendar!",
         })
     except Exception as e:
         st.session_state.messages.append({
