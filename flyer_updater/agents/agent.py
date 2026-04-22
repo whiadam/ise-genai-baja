@@ -29,12 +29,12 @@ def _get_runner_and_session():
             "then restart the app."
         ) from exc
 
-    from .tools import insert_event, check_duplicate_event, handle_welcome_prompt
+    from .tools import insert_event, check_duplicate_event 
 
     flyer_agent = Agent(
         name="flyer_agent",
         model=MODEL_NAME,
-        tools=[insert_event, check_duplicate_event, handle_welcome_prompt],
+        tools=[insert_event, check_duplicate_event, ],
         instruction=f"""ROLE: You help process campus flyer uploads into events.
 
             WORKFLOW:
