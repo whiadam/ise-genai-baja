@@ -10,26 +10,6 @@ from flyer_updater.flyer_event_form import render_event_form
 def render_landing_page():
     st.html(STYLE)
     _init_session_state()
-    # DEV: force form open for styling work
-    if st.session_state.event_form_key==0:
-        st.session_state.pending_event = {
-            "event_title": "Spring Career Fair",
-            "event_location": "Bryan Center",
-            "event_startime": "2026-05-15 14:00:00",
-            "event_endtime": "2026-05-15 16:00:00",
-            "department": "Career Services",
-            "description": "Meet recruiters from top tech companies.",
-            "creator": "career_services",
-            "confidence_scores": {
-                "event_title": 92,
-                "event_location": 65,      # <-- low, will show ⚠️
-                "event_startime": 88,
-                "event_endtime": 45,        # <-- low, will show ⚠️
-                "department": 78,
-                "description": 82,
-            },
-        }
-        st.session_state.original_extraction = dict(st.session_state.pending_event)
 
     with st.container(key="page_container"):
         input_mode = _render_top_selector()
