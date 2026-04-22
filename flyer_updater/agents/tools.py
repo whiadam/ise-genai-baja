@@ -77,4 +77,3 @@ def insert_event(
     flyer_id = create_flyer(flyer)
 
     return f"Event *{event_title}* was created with Event ID: {event_id} and Flyer ID:{flyer_id}"
-            

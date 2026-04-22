@@ -1,5 +1,8 @@
 STYLE=f"""
     <style>
+     [class*="st-key-starter_"] button {{
+        padding-right: 20px; 
+        }}
         [data-testid="stChatMessage"],
         [data-testid="stChatMessage"] * {{
         color: #ffffff;
