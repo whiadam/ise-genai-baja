@@ -52,7 +52,8 @@ def _event_form_dialog():
     with st.form("event_form_{st.session_state.event_form_key}"):
         title = st.text_input(
             _label("Event Title", "event_title", scores),
-            value=pending.get("event_title", ""),
+            value=pending.get("event_title", "")[:52],
+            max_chars=52,
         )
         location = st.text_input(
             _label("Location", "event_location", scores),

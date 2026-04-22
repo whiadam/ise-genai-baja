@@ -22,7 +22,7 @@ def preview_event(
     submission after the user reviews and confirms the form.
 
     Args:
-        event_title: The name of the event
+        event_title: The name of the event IMPORTANT:**52 Chars max summarize if too long -- add rest to description**
         event_location: Where the event takes place
         event_startime: Start time in YYYY-MM-DD HH:MM:SS format
         event_endtime: End time in YYYY-MM-DD HH:MM:SS format
