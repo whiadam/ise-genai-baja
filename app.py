@@ -5,7 +5,27 @@
 #
 #############################################################################
 import streamlit as st
+st.set_page_config(
+    page_title="Duke Campus",
+    initial_sidebar_state="expanded",
+    page_icon="./custom_components/duke.png"
+)
 
+st.html("""
+<style>
+    [data-testid="stSidebar"] a {
+        font-size: 16px !important;
+        font-weight: 400;
+    }
+    
+    [data-testid="stSidebar"] a:hover,
+    [data-testid="stSidebar"] a:focus,
+    a[aria-current="page"]{
+        font-size: 24px  !important;
+        font-weight: 700;
+    }
+</style>
+""")
 def register_pages():
     """Put modules(pages) in the return statement here"""
     return [

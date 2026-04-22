@@ -1,5 +1,8 @@
 STYLE=f"""
     <style>
+     [class*="st-key-starter_"] button {{
+        padding-right: 20px; 
+        }}
         [data-testid="stChatMessage"],
         [data-testid="stChatMessage"] * {{
         color: #ffffff;
@@ -15,10 +18,16 @@ STYLE=f"""
             min-height: 40px !important;
         }}
         .st-key-input_container{{
+            color: #C9D0DA;
             border: none;
             border-radius: 0px;
             border-bottom-left-radius: 10px;
             border-bottom-right-radius: 10px;
+        }}
+        .st-key-selector_container label,
+        .st-key-selector_container label p {{
+            color: #D3AF37 !important;
+            text-shadow: 0 0 1px rgba(255, 255, 255, 0.8);
         }}
         .st-key-page_container{{
             background: linear-gradient(to top, #012169, #00539B);

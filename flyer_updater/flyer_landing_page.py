@@ -1,8 +1,11 @@
 import time
+from requests import session
 import streamlit as st
 import uuid
 from flyer_updater.agents.agent_service import query_agent, get_or_create_session
 from flyer_updater.flyer_style import STYLE
+from flyer_updater.flyer_welcome_prompt import render_welcome_prompts
+
 
 def render_landing_page():
     st.html(STYLE)
@@ -11,9 +14,11 @@ def render_landing_page():
         input_mode= _render_top_selector()
         _render_media_input(input_mode)
         chat_container, prompt = _render_chat_area()
+        render_welcome_prompts(chat_container)
         if prompt:
                 _process_agent_query(chat_container, prompt=prompt)
         _handle_pending_media(chat_container)
+
 
 def _init_session_state():
     defaults = {
@@ -76,7 +81,7 @@ def _render_chat_area():
             )
 
         with input_container:
-            prompt = st.chat_input("Describe an Event!")
+            prompt = st.chat_input("Tell me about an event like you'd tell a friend, or upload a flyer photo!")
             audio = st.audio_input(
                     "Record Audio note", 
                     key=f"audio_file_upload_{st.session_state.media_key}",
@@ -92,16 +97,22 @@ def _render_message_history():
             st.write(msg["content"])
 
 def _process_agent_query(chat_container,prompt=None,image=None, audio=None, display=None):
-    st.session_state.messages.append({"role": "user", "content": prompt or display })
+    welcome_context = st.session_state.pop("pending_welcome_context", None)
+    message_to_agent = prompt or ""
+
+    if welcome_context:
+        message_to_agent = f"[Context: {welcome_context}]\n\n{message_to_agent}"
+
+    st.session_state.messages.append({"role": "user", "content": display or prompt})
     with chat_container:
         with st.chat_message("user", width="content"):
-            st.write(prompt or display)
+            st.write(display or prompt  )
         with st.chat_message("assistant"):
             with st.spinner("Working..."):
                 response = query_agent(
                     user_id=st.session_state.user_id,
                     session_id=st.session_state.session_id,
-                    message=prompt,
+                    message=message_to_agent,
                     image=image,
                     audio=audio,
                 )
@@ -133,3 +144,4 @@ def _stream_writer(response):
     for letter in response:
         yield letter
         time.sleep(0.01)
+
