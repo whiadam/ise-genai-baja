@@ -1,9 +1,59 @@
 from datetime import datetime
-from dataclasses import asdict
+import streamlit as st
 from event_module.event import Event
 from event_module.event_fetcher import create_event, get_upcoming_events
 from flyer_updater.flyer import Flyer
 from flyer_updater.flyer_fetcher import create_flyer
+
+def preview_event(
+        event_title: str,
+        event_location: str,
+        event_startime: str,
+        event_endtime: str,
+        department: str,
+        description: str,
+        creator: str,
+        confidence_scores: dict,
+    ) -> str:
+    """Present extracted event details to the user for review before saving.
+
+    Call this immediately after extracting event details from a flyer or 
+    user description. Do NOT call insert_event — the UI will handle 
+    submission after the user reviews and confirms the form.
+
+    Args:
+        event_title: The name of the event
+        event_location: Where the event takes place
+        event_startime: Start time in YYYY-MM-DD HH:MM:SS format
+        event_endtime: End time in YYYY-MM-DD HH:MM:SS format
+        department: The department hosting the event
+        description: A brief description of the event
+        creator: Who uploaded the event. Ask the user their name, put 
+            anonymous if not willing.
+        confidence_scores: Confidence 0-100 per field, 
+            example: {"event_title": 50, "event_location": 65}
+
+    Returns:
+        Confirmation that the preview has been shown.
+    """
+    extracted = {
+        "event_title": event_title,
+        "event_location": event_location,
+        "event_startime": event_startime,
+        "event_endtime": event_endtime,
+        "department": department,
+        "description": description,
+        "creator": creator,
+        "confidence_scores": confidence_scores or {},
+    }
+    
+    st.session_state.pending_event = dict(extracted)
+    st.session_state.original_extraction = dict(extracted)
+    
+    return (
+        "I've pulled out what I could. Please review the details below, "
+        "make any corrections, and click 'Submit to Calendar' to save."
+    )
 
 def check_duplicate_event()->str:
     """Gets all upcoming events for duplicate checking.
