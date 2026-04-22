@@ -5,9 +5,9 @@ from typing import Any
 
 import streamlit as st
 try:
-    from .alerts_fetcher import get_all_alerts
+    from .alerts_fetcher import get_all_alerts, get_genai_alert_summary
 except ImportError:
-    from alerts_fetcher import get_all_alerts
+    from alerts_fetcher import get_all_alerts, get_genai_alert_summary
 
 ##################### Danae's Section ############################
 def _ensure_alert_state() -> None:
@@ -26,6 +26,8 @@ def _ensure_alert_state() -> None:
         st.session_state["editing_alert_id"] = None
     if "active_alert_index" not in st.session_state:
         st.session_state["active_alert_index"] = 0
+    if "alert_summary" not in st.session_state:
+        st.session_state["alert_summary"] = None
 
 
 def _parse_dt(d: date, t: time) -> datetime:
@@ -182,12 +184,41 @@ def _render_active_alert_card(alert: dict[str, Any]) -> None:
                     st.rerun()
 
 
+def _render_smart_summary() -> None:
+    """
+    Renders the GenAI smart summary section.
+
+    Lines vibe-coded with GPT-5.2 Thinking.
+    """
+    st.markdown("### Smart Alert Summary")
+    st.caption("AI-generated overview of your current alerts")
+
+    summary_col, button_col = st.columns([3, 1])
+
+    with button_col:
+        refresh_summary = st.button("🔄 Refresh Summary", key="refresh_summary", use_container_width=True)
+
+    if refresh_summary:
+        with st.spinner("Generating smart summary..."):
+            try:
+                st.session_state["alert_summary"] = get_genai_alert_summary()
+            except Exception as e:
+                st.session_state["alert_summary"] = f"Error generating summary: {e}"
+
+    with summary_col:
+        if st.session_state["alert_summary"]:
+            st.info(st.session_state["alert_summary"])
+        else:
+            st.write("Click **Refresh Summary** to generate an AI overview of your alerts.")
+
+
 def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None = None) -> None:
     """
     Displays and manages alerts for the Campus Info App.
 
     Sections:
     - Top notification banner
+    - Smart alert summary
     - Create alert + settings
     - Active alerts carousel
     - Edit alert
@@ -239,6 +270,12 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
                     st.rerun()
 
     st.subheader("Alerts")
+
+    # =======================
+    # Smart Alert Summary
+    # =======================
+    _render_smart_summary()
+
     col_left, col_right = st.columns(2)
 
     # =======================
@@ -364,7 +401,7 @@ def display_alerts(user_id: str = "user1", events: list[dict[str, Any]] | None =
                     st.rerun()
 
             urgent_index = _get_urgent_alert_index(active)
-            if st.button("Jump to Urgent", key="alerts_jump_urgent", use_container_width=True):
+            if st.button("⚡ Jump to Urgent", key="alerts_jump_urgent", use_container_width=True):
                 st.session_state["active_alert_index"] = urgent_index
                 st.rerun()
 
