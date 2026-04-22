@@ -6,7 +6,6 @@
 #############################################################################
 
 from config import MODEL_NAME
-from flyer_landing_page import welcome_prompts
 _runner = None
 _session_service = None
 
