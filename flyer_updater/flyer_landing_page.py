@@ -1,8 +1,14 @@
 import time
+from requests import session
 import streamlit as st
 import uuid
 from flyer_updater.agents.agent_service import query_agent, get_or_create_session
 from flyer_updater.flyer_style import STYLE
+
+welcome_prompts=[(":material/chat:","I know about an event but don't have a flyer"),
+                 (":material/add_a_photo:","I have a flyer"),
+                 (":material/mic:","I'd rather talk it out"),
+                 ]
 
 def render_landing_page():
     st.html(STYLE)
@@ -11,9 +17,23 @@ def render_landing_page():
         input_mode= _render_top_selector()
         _render_media_input(input_mode)
         chat_container, prompt = _render_chat_area()
+        _render_welcome_prompts(chat_container)
         if prompt:
                 _process_agent_query(chat_container, prompt=prompt)
         _handle_pending_media(chat_container)
+
+def _render_welcome_button(welcome_prompt,chat_container):
+    if st.button(welcome_prompt[1], key=f"starter_{welcome_prompt[1]}",icon=welcome_prompt[0]):
+        _process_agent_query(chat_container,prompt=welcome_prompt[1])
+        st.rerun()
+
+def _render_welcome_prompts(chat_container):
+    with chat_container:
+        if not st.session_state.messages:
+            with st.container(key="welcome_prompt_container"):
+                for prompt in welcome_prompts:
+                    _render_welcome_button(prompt,chat_container)
+
 
 def _init_session_state():
     defaults = {
@@ -76,7 +96,7 @@ def _render_chat_area():
             )
 
         with input_container:
-            prompt = st.chat_input("Describe an Event!")
+            prompt = st.chat_input("Tell me about an event like you'd tell a friend, or upload a flyer photo!")
             audio = st.audio_input(
                     "Record Audio note", 
                     key=f"audio_file_upload_{st.session_state.media_key}",
@@ -133,3 +153,4 @@ def _stream_writer(response):
     for letter in response:
         yield letter
         time.sleep(0.01)
+
