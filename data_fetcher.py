@@ -176,7 +176,10 @@ def get_map_issues():
 
     return issues
 
-# Import functions from map_fetcher for backward compatibility with tests
+
+# ---------------------------------------------------------------------------
+# Re-export Adams Lab Functions from map_module for backwards compatibility
+# ---------------------------------------------------------------------------
 from map_module.map_fetcher import (
     get_user_profile,
     get_user_posts,
