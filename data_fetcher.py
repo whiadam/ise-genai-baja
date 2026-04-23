@@ -175,3 +175,10 @@ def get_map_issues():
         issue["lon"] = -77.02 + (i * 0.001)
 
     return issues
+
+# Import functions from map_fetcher for backward compatibility with tests
+from map_module.map_fetcher import (
+    get_user_profile,
+    get_user_posts,
+    get_genai_advice,
+)
