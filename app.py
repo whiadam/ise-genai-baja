@@ -29,7 +29,7 @@ st.html("""
 def register_pages():
     """Put modules(pages) in the return statement here"""
     return [
-        st.Page("campus_map.py", title="Campus Map", default = True),
+        st.Page("map_module/campus_map.py", title="Campus Map", default = True),
         st.Page("campus_info_dashboard.py", title="Dashboard"),
         st.Page("flyer_updater/flyer_view.py", title="Event Creation Agent"),
         st.Page("campus_voice.py", title="Campus Voice"),
