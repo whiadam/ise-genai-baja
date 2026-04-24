@@ -1,12 +1,22 @@
 import streamlit as st
 import pandas as pd
-from data_fetcher import (
-    get_active_polls,
-    get_filtered_issues,
-    get_facility_ratings,
-    get_trending_issues,
-    get_map_issues,
-)
+
+try:
+    from campus_voice.data_fetcher import (
+        get_active_polls,
+        get_filtered_issues,
+        get_facility_ratings,
+        get_trending_issues,
+        get_map_issues,
+    )
+except ModuleNotFoundError:
+    from data_fetcher import (
+        get_active_polls,
+        get_filtered_issues,
+        get_facility_ratings,
+        get_trending_issues,
+        get_map_issues,
+    )
 
 st.set_page_config(page_title="Campus Voice", layout="wide")
 
