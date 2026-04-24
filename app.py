@@ -5,6 +5,7 @@
 #
 #############################################################################
 import streamlit as st
+
 st.set_page_config(
     page_title="Duke Campus",
     initial_sidebar_state="expanded",
@@ -26,16 +27,18 @@ st.html("""
     }
 </style>
 """)
+
 def register_pages():
     """Put modules(pages) in the return statement here"""
     return [
-        st.Page("map_module/campus_map.py", title="Campus Map", default = True),
+        st.Page("map_module/campus_map.py", title="Campus Map", default=True),
         st.Page("campus_info_dashboard.py", title="Dashboard"),
         st.Page("flyer_updater/flyer_view.py", title="Event Creation Agent"),
-        st.Page("campus_voice.py", title="Campus Voice"),
-        st.Page("alerts_module/alerts_view.py"   , title="Alerts"),
+        st.Page("campus_voice/campus_voice.py", title="Campus Voice"),
+        st.Page("alerts_module/alerts_view.py", title="Alerts"),
         st.Page("event_module/view.py", title="Events"),
     ]
+
 if __name__ == '__main__':
     nav = st.navigation(register_pages())
     nav.run()
