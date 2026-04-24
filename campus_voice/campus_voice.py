@@ -17,8 +17,20 @@ if "selected_issue" not in st.session_state:
     st.session_state.selected_issue = None
 
 
+def remove_duplicates(items, key):
+    seen = set()
+    unique_items = []
+
+    for item in items:
+        value = item.get(key, "")
+        if value and value not in seen:
+            seen.add(value)
+            unique_items.append(item)
+
+    return unique_items
+
+
 def get_report_count(issue):
-    """Simple demo report count to match prototype style."""
     rating = issue.get("rating", 1)
     if rating == 5:
         return 20
@@ -31,9 +43,49 @@ def get_report_count(issue):
     return 3
 
 
-# -------------------------------
-# SIDEBAR NAVIGATION
-# -------------------------------
+fallback_polls = [
+    {"poll_question": "Should the library stay open later during midterms and finals?"},
+    {"poll_question": "What food should the dining hall have more often?"},
+    {"poll_question": "What kind of campus events do students want more of?"},
+]
+
+fallback_ratings = [
+    {"facility_name": "Gym", "rating": 4, "comment": "Good equipment but it gets crowded."},
+    {"facility_name": "Dining Hall", "rating": 3, "comment": "The food is okay but could be better."},
+    {"facility_name": "Library", "rating": 5, "comment": "Great study space during exams."},
+]
+
+fallback_issues = [
+    {
+        "issue_id": "1",
+        "title": "Dining Hall Food",
+        "description": "Students want more food options.",
+        "rating": 4,
+        "timestamp": "2026-04-24",
+        "lat": 36.001,
+        "lon": -78.938,
+    },
+    {
+        "issue_id": "2",
+        "title": "Broken Vending Machine",
+        "description": "Machine on 2nd floor is not working.",
+        "rating": 3,
+        "timestamp": "2026-04-24",
+        "lat": 36.002,
+        "lon": -78.939,
+    },
+    {
+        "issue_id": "3",
+        "title": "Dirty Bathroom",
+        "description": "Bathroom needs cleaning.",
+        "rating": 5,
+        "timestamp": "2026-04-24",
+        "lat": 36.003,
+        "lon": -78.940,
+    },
+]
+
+
 st.sidebar.title("Campus Voice")
 page_choice = st.sidebar.radio(
     "Go to",
@@ -46,9 +98,6 @@ page_choice = st.sidebar.radio(
 st.session_state.page = page_choice
 
 
-# -------------------------------
-# HOME SCREEN
-# -------------------------------
 if st.session_state.page == "Home":
     st.title("Campus Voice")
 
@@ -66,47 +115,58 @@ if st.session_state.page == "Home":
     st.subheader("Vote in a Poll")
     try:
         polls = get_active_polls()
-        if polls:
-            options = [poll["poll_question"] for poll in polls]
-            selected = st.selectbox("Choose a poll", options)
+        if not polls:
+            polls = fallback_polls
+    except Exception:
+        polls = fallback_polls
 
-            if st.button("Vote"):
-                st.success(f"You voted for: {selected}")
-        else:
-            st.write("No active polls")
-    except Exception as e:
-        st.error(f"Poll section error: {e}")
+    polls = remove_duplicates(polls, "poll_question")
+    poll_options = [poll["poll_question"] for poll in polls]
+
+    selected = st.selectbox("Choose a poll", poll_options)
+
+    if st.button("Vote"):
+        st.success(f"You voted for: {selected}")
 
     st.subheader("Facility Ratings")
     try:
         ratings = get_facility_ratings()
-        if ratings:
-            for r in ratings[:5]:
-                st.write(f"- {r['facility_name']}: {r['rating']}/5 — {r['comment']}")
-        else:
-            st.write("No ratings yet")
-    except Exception as e:
-        st.error(f"Ratings section error: {e}")
+        if not ratings:
+            ratings = fallback_ratings
+    except Exception:
+        ratings = fallback_ratings
+
+    seen_ratings = set()
+    unique_ratings = []
+
+    for r in ratings:
+        rating_text = f"{r.get('facility_name')}: {r.get('rating')}/5 — {r.get('comment')}"
+        if rating_text not in seen_ratings:
+            seen_ratings.add(rating_text)
+            unique_ratings.append(rating_text)
+
+    for rating_text in unique_ratings[:5]:
+        st.write(f"- {rating_text}")
 
     st.subheader("Campus Issues")
+    min_rating = st.selectbox("Show issues with rating at least", [1, 2, 3, 4, 5])
+
     try:
-        min_rating = st.selectbox("Show issues with rating at least", [1, 2, 3, 4, 5])
         issues = get_filtered_issues(min_rating)
+        if not issues:
+            issues = fallback_issues
+    except Exception:
+        issues = fallback_issues
 
-        if issues:
-            for issue in issues[:5]:
-                st.write(f"### {issue['title']}")
-                st.write(issue["description"])
-                st.caption(f"Rating: {issue['rating']} | Time: {issue['timestamp']}")
-        else:
-            st.write("No issues found")
-    except Exception as e:
-        st.error(f"Issues section error: {e}")
+    issues = [issue for issue in issues if issue.get("rating", 1) >= min_rating]
+    issues = remove_duplicates(issues, "title")
+
+    for issue in issues[:5]:
+        st.write(f"### {issue['title']}")
+        st.write(issue["description"])
+        st.caption(f"Rating: {issue['rating']} | Time: {issue['timestamp']}")
 
 
-# -------------------------------
-# TRENDING ISSUES SCREEN
-# -------------------------------
 elif st.session_state.page == "Trending Issues":
     st.title("Trending Issues")
     st.write("Top Issues This Week")
@@ -114,25 +174,23 @@ elif st.session_state.page == "Trending Issues":
 
     try:
         trending_issues = get_trending_issues()
+        if not trending_issues:
+            trending_issues = fallback_issues
+    except Exception:
+        trending_issues = fallback_issues
 
-        if trending_issues:
-            for i, issue in enumerate(trending_issues, start=1):
-                report_count = get_report_count(issue)
-                button_label = f"#{i} {issue['title']} ({report_count} reports)"
+    trending_issues = remove_duplicates(trending_issues, "title")
 
-                if st.button(button_label, key=f"trend_{issue['issue_id']}"):
-                    st.session_state.selected_issue = issue
-                    st.session_state.page = "Issue Details"
-                    st.rerun()
-        else:
-            st.write("No trending issues right now.")
-    except Exception as e:
-        st.error(f"Trending section error: {e}")
+    for i, issue in enumerate(trending_issues, start=1):
+        report_count = get_report_count(issue)
+        button_label = f"#{i} {issue['title']} ({report_count} reports)"
+
+        if st.button(button_label, key=f"trend_{issue['issue_id']}"):
+            st.session_state.selected_issue = issue
+            st.session_state.page = "Issue Details"
+            st.rerun()
 
 
-# -------------------------------
-# ISSUE DETAILS SCREEN
-# -------------------------------
 elif st.session_state.page == "Issue Details":
     st.title("Issue Details")
 
@@ -168,34 +226,32 @@ elif st.session_state.page == "Issue Details":
             st.rerun()
 
 
-# -------------------------------
-# MAP VIEW SCREEN
-# -------------------------------
 elif st.session_state.page == "Map View":
     st.title("Map View")
     st.write("This screen shows where issues are happening around campus.")
 
     try:
         map_issues = get_map_issues()
+        if not map_issues:
+            map_issues = fallback_issues
+    except Exception:
+        map_issues = fallback_issues
 
-        if map_issues:
-            map_data = pd.DataFrame(
-                [{"lat": issue["lat"], "lon": issue["lon"]} for issue in map_issues]
-            )
-            st.map(map_data)
+    map_issues = remove_duplicates(map_issues, "title")
 
-            st.write("### Issue Locations")
-            st.caption("Click to view details")
+    map_data = pd.DataFrame(
+        [{"lat": issue["lat"], "lon": issue["lon"]} for issue in map_issues]
+    )
+    st.map(map_data)
 
-            for issue in map_issues:
-                report_count = get_report_count(issue)
-                button_label = f"{issue['title']} ({report_count} reports)"
+    st.write("### Issue Locations")
+    st.caption("Click to view details")
 
-                if st.button(button_label, key=f"map_{issue['issue_id']}"):
-                    st.session_state.selected_issue = issue
-                    st.session_state.page = "Issue Details"
-                    st.rerun()
-        else:
-            st.write("No map issues available.")
-    except Exception as e:
-        st.error(f"Map section error: {e}")
+    for issue in map_issues:
+        report_count = get_report_count(issue)
+        button_label = f"{issue['title']} ({report_count} reports)"
+
+        if st.button(button_label, key=f"map_{issue['issue_id']}"):
+            st.session_state.selected_issue = issue
+            st.session_state.page = "Issue Details"
+            st.rerun()
